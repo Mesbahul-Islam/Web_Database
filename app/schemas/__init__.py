@@ -1,0 +1,102 @@
+from pydantic import BaseModel as _PydanticBaseModel
+
+from .alkuperaa_koskevat_tiedot import *
+from .alkuperainen_kasvupaikka import *
+from .eikaytossalista_kasvupaikan_tyyppi import *
+from .eikaytossa_lista_kaytto import *
+from .eikaytossalista_kaytto import *
+from .eikaytossalista_lahettaja import *
+from .eikaytossalista_viljelykasvit import *
+from .hankintanumero import *
+from .hankintatiedot import *
+from .heimo import *
+from .huomioita import *
+from .huomoita import *
+from .hyotykaytto import *
+from .kansainvaliset_sopimukset import *
+from .kasvatustietoja import *
+from .kasvin_kayttotarkoitus import *
+from .kayttajatiedot import *
+from .kayttotarkoitus import *
+from .koe import *
+from .koristekaytto import *
+from .laakekaytto import *
+from .lahettaja import *
+from .lista_alkuperainen_kasvupaikka import *
+from .lista_alkuperainen_levinneisyys import *
+from .lista_alkuperainen_vai_tulokas import *
+from .lista_alkuperatyyppi import *
+from .lista_ei_kesta_seuraavia_torjunta_aineita import *
+from .lista_haku import *
+from .lista_hyotykaytto import *
+from .lista_ilmastonkestavyys import *
+from .lista_isokoodi import *
+from .lista_kasvinsaapuminen import *
+from .lista_kasvumuoto import *
+from .lista_kasvupaikka_suomessa import *
+from .lista_kayttotarkoitus import *
+from .lista_kestaa_seuraavia_torjunta_aineita import *
+from .lista_kieli import *
+from .lista_koristekaytto import *
+from .lista_laakekaytto import *
+from .lista_lahettajantyyppi import *
+from .lista_levinneisyysalue_maailmalla import *
+from .lista_lisaystapa import *
+from .lista_luonnonsuojeluarvo_muualla import *
+from .lista_luonnonsuojeluarvo_suomessa import *
+from .lista_luonnonvarainen_levinneisyys import *
+from .lista_maarittaja import *
+from .lista_maaritysmerkinta import *
+from .lista_millaisenasaatu import *
+from .lista_naytteensijainti import *
+from .lista_naytteentyyppi import *
+from .lista_neuvoisuus_kotisuus import *
+from .lista_osasto import *
+from .lista_polytystapa import *
+from .lista_puutarhanerikoiskokoelma import *
+from .lista_puutarhanomakokoelma import *
+from .lista_rauhoitukset import *
+from .lista_siemenia_jaljella import *
+from .lista_sopimukset import *
+from .lista_status import *
+from .lista_tarkastajanimi import *
+from .lista_tarkastaja import *
+from .lista_tuulenkestavyys import *
+from .lista_varsi import *
+from .lista_viherrakentamiskaytto import *
+from .lista_viljelyn_tarkoitus import *
+from .lista_ymparistoindikaattoriluonne import *
+from .lukitut_taulut import *
+from .maailman_levinneisyysalue import *
+from .maaritysmerkinta import *
+from .muunkielinen_nimi import *
+from .naytetietoja import *
+from .naytetieto import *
+from .osastopaikka import *
+from .puutarhassa_viljelyn_tarkoitus import *
+from .sijoituspaikka import *
+from .suomalainen_kasvupaikka import *
+from .suomalainen_levinneisyysalue import *
+from .suunniteltu_kasvupaikka import *
+from .synonyymi import *
+from .taksonin_lappu import *
+from .taksonin_viljelytiedot import *
+from .taksoni import *
+from .tarkastajanimi_lista import *
+from .tarkastusmerkinta import *
+from .testi import *
+from .toimenpide import *
+from .viherrakentamiskaytto import *
+from .viite import *
+from .ymparistoindikaattoriluonne import *
+
+
+def _rebuild_models() -> None:
+	namespace = globals()
+
+	for value in namespace.values():
+		if isinstance(value, type) and issubclass(value, _PydanticBaseModel) and value is not _PydanticBaseModel:
+			value.model_rebuild(_types_namespace=namespace)
+
+
+_rebuild_models()

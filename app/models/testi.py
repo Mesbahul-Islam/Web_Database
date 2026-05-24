@@ -1,0 +1,17 @@
+from .base import Base
+from typing import Optional
+import datetime
+from sqlalchemy import Column, Date, ForeignKeyConstraint, Index, String, Table, Text, text
+from sqlalchemy.dialects.mysql import INTEGER, TINYINT
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+
+
+class Testi(Base):
+    # Test table
+    __tablename__ = 'testi'
+    # ID
+    id: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
+    # Date
+    pvm: Mapped[Optional[str]] = mapped_column(String(255))
+    # New date
+    uuspvm: Mapped[Optional[datetime.date]] = mapped_column(Date)

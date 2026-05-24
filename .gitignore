@@ -1,0 +1,9 @@
+.venv/
+.github/
+__pycache__/
+*.pyc
+backup-su 22.11.2020.back
+.env
+puutarha_sqlite.sql
+docs/
+docker
