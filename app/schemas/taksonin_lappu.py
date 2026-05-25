@@ -1,12 +1,11 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional, List
+from typing import Optional
 from datetime import date, datetime
 
 class TaksoninLappuBase(BaseModel):
     Lappu_nro: int
     Lappu_teksti: Optional[str]
     taksonin_nro: Optional[int]
-    taksoni: Optional['Taksoni']
 
 class TaksoninLappuCreate(TaksoninLappuBase):
     pass

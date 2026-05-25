@@ -1,6 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional, List
-from datetime import date, datetime
+from typing import Optional
 
 class TarkastusmerkintaBase(BaseModel):
     tarkastusnro: int
@@ -10,8 +9,7 @@ class TarkastusmerkintaBase(BaseModel):
     tarkastaja: Optional[str]
     kasvin_huomautuksia: Optional[str]
     sijoituspaikan_nro: Optional[int]
-    uus_tarkastuspvm: Optional[date]
-    sijoituspaikka: Optional['Sijoituspaikka']
+    uus_tarkastuspvm: Optional[str]
 
 class TarkastusmerkintaCreate(TarkastusmerkintaBase):
     pass

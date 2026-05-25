@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional, List
+from typing import Optional
 from datetime import date, datetime
 
 class SuomalainenLevinneisyysalueBase(BaseModel):
@@ -9,8 +9,6 @@ class SuomalainenLevinneisyysalueBase(BaseModel):
     levinneisyysalueen_tarkenne: Optional[str]
     alkuperainen_vai_tulokas: Optional[str]
     viitenro: Optional[int]
-    taksoni: Optional['Taksoni'] = None
-    viite: Optional['Viite']
 
 class SuomalainenLevinneisyysalueCreate(SuomalainenLevinneisyysalueBase):
     pass

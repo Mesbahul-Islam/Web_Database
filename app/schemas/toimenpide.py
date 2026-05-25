@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional, List
+from typing import Optional
 from datetime import date, datetime
 
 class ToimenpideBase(BaseModel):
@@ -8,7 +8,6 @@ class ToimenpideBase(BaseModel):
     toimenpide: Optional[str]
     hankintaID: Optional[int]
     uus_pvm: Optional[date]
-    hankintatiedot: Optional['Hankintatiedot']
 
 class ToimenpideCreate(ToimenpideBase):
     pass

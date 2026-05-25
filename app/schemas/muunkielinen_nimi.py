@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional, List
+from typing import Optional
 from datetime import date, datetime
 
 class MuunkielinenNimiBase(BaseModel):
@@ -9,8 +9,6 @@ class MuunkielinenNimiBase(BaseModel):
     kieli: Optional[str]
     viitenro: Optional[int]
     viite_2: Optional[int]
-    taksoni: Optional['Taksoni'] = None
-    viite: Optional['Viite']
 
 class MuunkielinenNimiCreate(MuunkielinenNimiBase):
     pass

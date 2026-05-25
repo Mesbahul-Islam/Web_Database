@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional, List
+from typing import Optional
 from datetime import date, datetime
 
 class NaytetietoBase(BaseModel):
@@ -13,8 +13,6 @@ class NaytetietoBase(BaseModel):
     viitenro: Optional[int]
     sijainnin_selite: Optional[str]
     viitteen_selite: Optional[str]
-    taksoni: Optional['Taksoni'] = None
-    viite: Optional['Viite']
 
 class NaytetietoCreate(NaytetietoBase):
     pass

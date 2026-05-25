@@ -1,5 +1,4 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional, List
 from datetime import date, datetime
 
 class ListaIsokoodiBase(BaseModel):

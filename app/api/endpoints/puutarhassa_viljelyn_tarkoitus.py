@@ -16,7 +16,7 @@ def read_all(request: Request, skip: int = 0, limit: int = 100, db: Session = De
 
 @router.get("/{hankintaid}", response_model=Schema)  # hankintaid: acquisition id
 def read_one(hankintaid: str, db: Session = Depends(get_db)):  # hankintaid: acquisition id
-    item = db.query(Model).filter(Model.hankintaid == hankintaid).first()  # hankintaid: acquisition id
+    item = db.query(Model).filter(Model.hankintaID == hankintaid).first()  # hankintaid: acquisition id
     if not item:
         raise HTTPException(status_code=404, detail="Not found")
     return item

@@ -12,12 +12,13 @@ services:
       MYSQL_DATABASE: puutarhakanta2005
       # Optional: set to a specific filename present in ./db-backups
       # Example: DB_RESTORE_FILE=backup.sql
-      DB_RESTORE_FILE: ""
+      DB_RESTORE_FILE: "backup-su 22.11.2020.back"
     ports:
       - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
       - ./db-backups:/restore:ro
+      - ./:/workspace:ro
       - ./docker/mysql-init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -prootpassword --silent"]

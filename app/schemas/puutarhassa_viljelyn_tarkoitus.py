@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional, List
+from typing import Optional
 from datetime import date, datetime
 
 class PuutarhassaViljelynTarkoitusBase(BaseModel):
@@ -7,7 +7,6 @@ class PuutarhassaViljelynTarkoitusBase(BaseModel):
     hankintaID: int
     puutarhassa_viljelyn_tarkoitus: Optional[str]
     puutarhassa_viljelyn_tarkenne: Optional[str]
-    hankintatiedot: Optional['Hankintatiedot'] = None
 
 class PuutarhassaViljelynTarkoitusCreate(PuutarhassaViljelynTarkoitusBase):
     pass

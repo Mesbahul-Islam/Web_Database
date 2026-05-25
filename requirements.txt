@@ -1,3 +1,6 @@
 fastapi[standard]
 sqlalchemy
 pymysql
+pytest
+httpx
+openapi-spec-validator

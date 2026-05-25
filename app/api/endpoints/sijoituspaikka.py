@@ -3,9 +3,10 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from app.api.query import apply_filters
+from app.api.crud import create_item, update_item, delete_item
 from app.database import get_db
 from app.models.sijoituspaikka import Sijoituspaikka as Model  # sijoituspaikka: placement location
-from app.schemas.sijoituspaikka import Sijoituspaikka as Schema  # sijoituspaikka: placement location
+from app.schemas.sijoituspaikka import Sijoituspaikka as Schema, SijoituspaikkaCreate as SchemaCreate  # sijoituspaikka: placement location
 
 router = APIRouter()
 
@@ -15,8 +16,21 @@ def read_all(request: Request, skip: int = 0, limit: int = 100, db: Session = De
     return query.offset(skip).limit(limit).all()
 
 @router.get("/{sijoituspaikan_nro}", response_model=Schema)  # sijoituspaikan_nro: placement number
-def read_one(sijoituspaikan_nro: str, db: Session = Depends(get_db)):  # sijoituspaikan_nro: placement number
+def read_one(sijoituspaikan_nro: int, db: Session = Depends(get_db)):  # sijoituspaikan_nro: placement number
     item = db.query(Model).filter(Model.sijoituspaikan_nro == sijoituspaikan_nro).first()  # sijoituspaikan_nro: placement number
     if not item:
         raise HTTPException(status_code=404, detail="Not found")
     return item
+
+@router.post("/", response_model=Schema, status_code=201)
+async def create_one(payload: SchemaCreate, db: Session = Depends(get_db)):
+    return await create_item(payload, db, Model)
+
+@router.put("/{sijoituspaikan_nro}", response_model=Schema)
+async def update_one(sijoituspaikan_nro: int, payload: SchemaCreate, db: Session = Depends(get_db)):
+    return await update_item(payload, db, Model, "sijoituspaikan_nro", sijoituspaikan_nro)
+
+@router.delete("/{sijoituspaikan_nro}", status_code=204)
+async def delete_one(sijoituspaikan_nro: int, db: Session = Depends(get_db)):
+    await delete_item(db, Model, "sijoituspaikan_nro", sijoituspaikan_nro)
+

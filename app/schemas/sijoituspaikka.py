@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional, List
+from typing import Optional
 from datetime import date, datetime
 
 class SijoituspaikkaBase(BaseModel):
@@ -12,8 +12,6 @@ class SijoituspaikkaBase(BaseModel):
     sijoituspaikan_koordinaatit: Optional[str]
     sijoituspaikka_vanhat_tiedot: Optional[str]
     kasvin_huomautuksia: Optional[str]
-    osastopaikka: Optional['Osastopaikka'] = None
-    tarkastusmerkinta: Optional[list['Tarkastusmerkinta']] = None
 
 class SijoituspaikkaCreate(SijoituspaikkaBase):
     pass

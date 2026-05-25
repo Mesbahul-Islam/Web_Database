@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional, List
+from typing import Optional
 from datetime import date, datetime
 
 class HeimoBase(BaseModel):
@@ -16,7 +16,6 @@ class HeimoBase(BaseModel):
     paaryhma: Optional[str]
     paaryhmannumero: Optional[str]
     suom_nimi: Optional[str]
-    taksoni: list['Taksoni']
 
 class HeimoCreate(HeimoBase):
     pass

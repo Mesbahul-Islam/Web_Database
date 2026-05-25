@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional, List
+from typing import Optional
 from datetime import date, datetime
 
 class KasvinKayttotarkoitusBase(BaseModel):
@@ -9,8 +9,6 @@ class KasvinKayttotarkoitusBase(BaseModel):
     kaytto: Optional[str]
     selite: Optional[str]
     viitenro: Optional[int]
-    taksoni: Optional['Taksoni'] = None
-    viite: Optional['Viite']
 
 class KasvinKayttotarkoitusCreate(KasvinKayttotarkoitusBase):
     pass

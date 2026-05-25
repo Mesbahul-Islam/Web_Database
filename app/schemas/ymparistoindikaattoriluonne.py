@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional, List
+from typing import Optional
 from datetime import date, datetime
 
 class YmparistoindikaattoriluonneBase(BaseModel):
@@ -8,8 +8,6 @@ class YmparistoindikaattoriluonneBase(BaseModel):
     ymparistoindikaattoriluonne: Optional[str]
     ymparistoindikaattorin_selite: Optional[str]
     viitenro: Optional[int]
-    taksoni: Optional['Taksoni'] = None
-    viite: Optional['Viite']
 
 class YmparistoindikaattoriluonneCreate(YmparistoindikaattoriluonneBase):
     pass

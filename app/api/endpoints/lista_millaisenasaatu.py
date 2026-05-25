@@ -16,7 +16,7 @@ def read_all(request: Request, skip: int = 0, limit: int = 100, db: Session = De
 
 @router.get("/{id}", response_model=Schema)  # id: id
 def read_one(id: int, db: Session = Depends(get_db)):  # id: id
-    item = db.query(Model).filter(Model.id == id).first()  # id: id
+    item = db.query(Model).filter(Model.ID == id).first()  # id: id
     if not item:
         raise HTTPException(status_code=404, detail="Not found")
     return item

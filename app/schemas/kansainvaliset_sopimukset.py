@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional, List
+from typing import Optional
 from datetime import date, datetime
 
 class KansainvalisetSopimuksetBase(BaseModel):
@@ -8,8 +8,6 @@ class KansainvalisetSopimuksetBase(BaseModel):
     Sopimuksen_nimi: Optional[str]
     selite: Optional[str]
     viitenro: Optional[int]
-    taksoni: Optional['Taksoni'] = None
-    viite: Optional['Viite']
 
 class KansainvalisetSopimuksetCreate(KansainvalisetSopimuksetBase):
     pass
