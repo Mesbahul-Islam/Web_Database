@@ -7,3 +7,4 @@ backup-su 22.11.2020.back
 puutarha_sqlite.sql
 docs/
 docker
+sqlite-backup

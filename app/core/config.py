@@ -19,7 +19,11 @@ DB_PORT = int(os.getenv("DB_PORT", "3306"))
 DB_NAME = os.getenv("DB_NAME", "puutarhakanta2005")
 DB_USER = os.getenv("DB_USER", "tarkastususer")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "tarkastususer")
+SECRET_KEY=os.getenv("SECRET_KEY")
+ALGORITHM=os.getenv("ALGORITHM", "HS256")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "15"))
+
 
 DATABASE_URL = os.getenv("DATABASE_URL") or (
-    f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    f"sqlite:///{_PROJECT_ROOT / 'sqlite-backup' / 'puutarhakanta2005.sqlite'}"
 )

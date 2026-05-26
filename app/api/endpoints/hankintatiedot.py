@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Annotated
 
 from app.api.query import apply_filters
 from app.api.crud import create_item, update_item, delete_item
 from app.database import get_db
+from app.security.utils import get_current_user
+from app.models.user import User
 from app.models.hankintatiedot import Hankintatiedot as Model  # hankintatiedot: acquisition_data
 from app.schemas.hankintatiedot import Hankintatiedot as Schema, HankintatiedotCreate as SchemaCreate  # hankintatiedot: acquisition_data
 
@@ -23,14 +25,14 @@ def read_one(hankintaID: int, db: Session = Depends(get_db)):  # hankintaID: acq
     return item
 
 @router.post("/", response_model=Schema, status_code=201)
-async def create_one(payload: SchemaCreate, db: Session = Depends(get_db)):
+async def create_one(payload: SchemaCreate, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):
     return await create_item(payload, db, Model)
 
 @router.put("/{hankintaID}", response_model=Schema)
-async def update_one(hankintaID: int, payload: SchemaCreate, db: Session = Depends(get_db)):
+async def update_one(hankintaID: int, payload: SchemaCreate, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):
     return await update_item(payload, db, Model, "hankintaID", hankintaID)
 
 @router.delete("/{hankintaID}", status_code=204)
-async def delete_one(hankintaID: int, db: Session = Depends(get_db)):
+async def delete_one(hankintaID: int, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):
     await delete_item(db, Model, "hankintaID", hankintaID)
 

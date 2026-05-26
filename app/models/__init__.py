@@ -87,3 +87,4 @@ from .toimenpide import *
 from .viherrakentamiskaytto import *
 from .viite import *
 from .ymparistoindikaattoriluonne import *
+from app.models.user import User

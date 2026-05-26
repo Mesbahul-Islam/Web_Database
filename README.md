@@ -4,13 +4,15 @@ REST API for the Finnish botanical garden plant collection database (*puutarhaka
 
 ## What It Does
 
-Provides read-only access to a botanical garden's plant records:
+Provides full CRUD access to a botanical garden's plant records:
 - Taxa (species, varieties, cultivars)
 - Acquisitions (how/when/from-whom plants were obtained)
 - Physical garden locations and inspection records
 - Taxonomic classification data
 - Specimen and seed bank records
 - International conservation agreement data
+
+Read (GET) operations are public. Write operations (POST/PUT/DELETE) require JWT authentication.
 
 ## Quick Start
 
@@ -75,18 +77,45 @@ API docs: `http://localhost:8000/docs`
 | `DB_USER` | `tarkastususer` | MySQL user |
 | `DB_PASSWORD` | `tarkastususer` | MySQL password |
 | `DATABASE_URL` | _(computed)_ | Full SQLAlchemy URL (overrides above) |
+| `JWT_SECRET_KEY` | _(required)_ | Secret key for signing JWT tokens (min 32 chars) |
+| `JWT_ALGORITHM` | `HS256` | Algorithm for JWT signing |
+| `JWT_EXPIRATION_HOURS` | `24` | JWT token expiration time in hours |
 
 ## API Usage
 
-All endpoints follow the same pattern:
+### Endpoint Patterns
 
+**Read (Public)**:
 ```
-GET /{resource}/                    → list (supports ?skip=&limit= and any column filter)
+GET /{resource}/                    → list all (supports ?skip=&limit= and any column filter)
 GET /{resource}/{primary_key}       → single record
 ```
 
-### Example requests
+**Write (Authentication Required)**:
+```
+POST /{resource}/                   → create new record (requires Bearer token)
+PUT /{resource}/{primary_key}       → update record (requires Bearer token)
+DELETE /{resource}/{primary_key}    → delete record (requires Bearer token)
+```
 
+### Authentication
+
+To access write operations, include a JWT bearer token in the request header:
+```bash
+Authorization: Bearer <jwt_token>
+```
+
+Obtain a token by logging in:
+```bash
+POST /auth/token
+Content-Type: application/x-www-form-urlencoded
+
+username=<user>&password=<password>
+```
+
+### Example Requests
+
+**Read operations (no auth required)**:
 ```bash
 # Get first 10 taxa
 GET /taksoni/?limit=10
@@ -99,6 +128,27 @@ GET /hankintatiedot/12345
 
 # Find senders by country
 GET /lahettaja/?maa=Suomi
+```
+
+**Write operations (auth required)**:
+```bash
+# Create new taxa (requires Bearer token)
+POST /taksoni/
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{"suku": "Rosa", "laji": "canina"}
+
+# Update record
+PUT /taksoni/{id}
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{"suku": "Rosa", "laji": "acicularis"}
+
+# Delete record
+DELETE /taksoni/{id}
+Authorization: Bearer <token>
 ```
 
 ## Project Structure

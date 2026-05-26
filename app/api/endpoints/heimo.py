@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Annotated
 
 from app.api.query import apply_filters
 from app.api.crud import create_item, update_item, delete_item
 from app.database import get_db
+from app.security.utils import get_current_user
+from app.models.user import User
 from app.models.heimo import Heimo as Model  # heimo: family
 from app.schemas.heimo import Heimo as Schema, HeimoCreate as SchemaCreate  # heimo: family
 
@@ -23,14 +25,14 @@ def read_one(jarjestysnumero: int, db: Session = Depends(get_db)):  # jarjestysn
     return item
 
 @router.post("/", response_model=Schema, status_code=201)
-async def create_one(payload: SchemaCreate, db: Session = Depends(get_db)):
+async def create_one(payload: SchemaCreate, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):
     return await create_item(payload, db, Model)
 
 @router.put("/{jarjestysnumero}", response_model=Schema)
-async def update_one(jarjestysnumero: int, payload: SchemaCreate, db: Session = Depends(get_db)):
+async def update_one(jarjestysnumero: int, payload: SchemaCreate, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):
     return await update_item(payload, db, Model, "jarjestysnumero", jarjestysnumero)
 
 @router.delete("/{jarjestysnumero}", status_code=204)
-async def delete_one(jarjestysnumero: int, db: Session = Depends(get_db)):
+async def delete_one(jarjestysnumero: int, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):
     await delete_item(db, Model, "jarjestysnumero", jarjestysnumero)
 

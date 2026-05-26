@@ -3,4 +3,5 @@ sqlalchemy
 pymysql
 pytest
 httpx
-openapi-spec-validator
+pyjwt
+pwdlib
