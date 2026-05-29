@@ -2,7 +2,7 @@ from .base import Base
 from typing import Optional
 import datetime
 from sqlalchemy import Column, Date, ForeignKeyConstraint, Index, String, Table, Text, text
-from sqlalchemy.dialects.mysql import INTEGER, TINYINT
+from sqlalchemy import Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -11,9 +11,9 @@ class TaksoninViljelytiedot(Base):
     __tablename__ = 'taksonin_viljelytiedot'
     __table_args__ = (ForeignKeyConstraint(['taksonin_nro'], ['taksoni.taksonin_nro'], name='taksonin_viljelytiedot_ibfk_1'), Index('IDX_Taksonin_viljelytiedot1', 'taksonin_nro'))
     # Cultivation additional information number
-    lisatietojen_nro_viljely: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
+    lisatietojen_nro_viljely: Mapped[int] = mapped_column(Integer, primary_key=True)
     # Taxon number
-    taksonin_nro: Mapped[int] = mapped_column(INTEGER(11), nullable=False, server_default=text('0'))
+    taksonin_nro: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0'))
     # Plant diseases and pests
     kasvitaudit_ja_tuholaiset: Mapped[Optional[str]] = mapped_column(String(255))
     # Tolerates following pesticides

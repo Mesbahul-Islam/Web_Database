@@ -30,68 +30,22 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-Edit `.env` with your database and authentication settings (see [Environment Variables](#environment-variables) section below).
+Edit `.env` with your database and authentication settings. The app uses `DATABASE_URL` directly, so set it to a SQLAlchemy-compatible connection string for the database you want to use.
 
-### 3. Initialize Database
+### 3. Load the PostgreSQL Dump
 
-**Option A: Use Local SQLite (Default)**
+The repository includes a PostgreSQL-ready dump at `db-backups/puutarhakanta2005_postgres_data.sql`.
 
-SQLite is the default database. No additional setup required—just ensure the directory exists:
-
-```bash
-mkdir -p ./sqlite-backup
-```
-
-The app will automatically use `./sqlite-backup/puutarhakanta2005.sqlite`.
-
-To load data into SQLite from a MySQL dump:
+Import it with `psql` using the same `DATABASE_URL` value from `.env`:
 
 ```bash
-# Convert MySQL dump to SQLite (requires sqlite3 CLI installed)
-sqlite3 ./sqlite-backup/puutarhakanta2005.sqlite < puutarhakanta2005_schema.sql
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db-backups/puutarhakanta2005_postgres_data.sql
 ```
 
-Or use Python to restore from backup:
+If you need to regenerate the dump from the SQLite backup, run:
 
 ```bash
-python3 -c "
-import sqlite3
-from app.database import engine
-conn = sqlite3.connect('./sqlite-backup/puutarhakanta2005.sqlite')
-with open('puutarhakanta2005_schema.sql', 'r') as f:
-    conn.executescript(f.read())
-conn.commit()
-conn.close()
-print('SQLite database initialized')
-"
-```
-
-**Option B: Use Docker MySQL**
-
-```bash
-mkdir -p ./db-backups
-cp puutarhakanta2005_schema.sql ./db-backups/
-docker compose up -d mysql
-```
-
-Then configure `.env`:
-```
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_NAME=puutarhakanta2005
-DB_USER=tarkastususer
-DB_PASSWORD=tarkastususer
-```
-
-**Option C: Use External MySQL**
-
-Configure `.env` with your server details:
-```
-DB_HOST=your-mysql-host
-DB_PORT=3306
-DB_NAME=puutarhakanta2005
-DB_USER=your_user
-DB_PASSWORD=your_password
+python migrate_sqlite_to_pg.py
 ```
 
 ### 4. Run the Application
@@ -104,84 +58,29 @@ API will be available at `http://localhost:8000`
 
 ## Database Setup Details
 
-### SQLite Setup
+The runtime reads a single database setting: `DATABASE_URL`.
 
-The default database is SQLite, which requires no separate server installation.
-
-**Initialize from schema:**
+Use a PostgreSQL SQLAlchemy URL for Prisma Postgres or any other compatible PostgreSQL instance:
 
 ```bash
-mkdir -p ./sqlite-backup
-sqlite3 ./sqlite-backup/puutarhakanta2005.sqlite < puutarhakanta2005_schema.sql
+postgresql+psycopg2://USER:PASSWORD@HOST:5432/postgres?sslmode=require
 ```
 
-**Verify tables created:**
+The application does not branch on `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, or `DB_PASSWORD` at runtime. Keep them out of your local setup unless another tool in your workflow still needs them.
+
+To check the configured database URL, run:
 
 ```bash
-sqlite3 ./sqlite-backup/puutarhakanta2005.sqlite ".tables"
-```
-
-**Restore from existing backup:**
-
-```bash
-# If you have a .sqlite file, just copy it
-cp /path/to/backup.sqlite ./sqlite-backup/puutarhakanta2005.sqlite
-```
-
-**Query the database directly:**
-
-```bash
-sqlite3 ./sqlite-backup/puutarhakanta2005.sqlite
-sqlite> SELECT COUNT(*) FROM taksoni;
-sqlite> .quit
-```
-
-### MySQL Setup
-
-For Docker MySQL development:
-
-```bash
-mkdir -p ./db-backups
-cp puutarhakanta2005_schema.sql ./db-backups/
-docker compose up -d mysql
-```
-
-Restore schema after container starts:
-
-```bash
-mysql -h127.0.0.1 -P3306 -utarkastususer -ptarkastususer puutarhakanta2005 < puutarhakanta2005_schema.sql
-```
-
-```bash
-mysql -h127.0.0.1 -P3306 -utarkastususer -ptarkastususer -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='puutarhakanta2005';"
-```
-
-### Connection Verification
-
-Test your database connection before running the app:
-
-```bash
-python3 -c "from app.database import engine; print('Connection OK' if engine.connect() else 'Failed')"
+python3 -c "from app.core.config import DATABASE_URL; print(DATABASE_URL)"
 ```
 
 ## Environment Variables
 
 ### Database Connection
 
-**For SQLite (Default):**
-No database variables needed. The app automatically uses `./sqlite-backup/puutarhakanta2005.sqlite`.
-
-**For MySQL:**
-Set these variables in `.env`:
-
 | Variable | Default | Description |
-|----------|---------|----------|
-| `DB_HOST` | `localhost` | MySQL host |
-| `DB_PORT` | `3306` | MySQL port |
-| `DB_NAME` | `puutarhakanta2005` | Database name |
-| `DB_USER` | `tarkastususer` | MySQL user |
-| `DB_PASSWORD` | `tarkastususer` | MySQL password |
-| `DATABASE_URL` | _(none)_ | **Optional**: Full SQLAlchemy URL to override above vars (e.g., `mysql+pymysql://user:pass@host:3306/db`) |
+|----------|---------|-------------|
+| `DATABASE_URL` | _(required)_ | Full SQLAlchemy URL for the database connection (for example, `postgresql+psycopg2://user:pass@host:5432/postgres?sslmode=require`) |
 
 ### Authentication
 
@@ -278,85 +177,25 @@ app/
 
 ## Database
 
-MySQL 8 database `puutarhakanta2005`. Schema defined in `puutarhakanta2005_schema.sql`.
-Approximately 89 tables, ~11,700 taxa, ~57,000 acquisition records.
+PostgreSQL database loaded from `db-backups/puutarhakanta2005_postgres_data.sql`.
+The dump was generated from the bundled SQLite backup and is intended for Prisma Postgres or any other PostgreSQL-compatible server.
 
 ## Troubleshooting
 
-### SQLite Issues
+### Database Connection Errors
 
-**Error: "sqlite3: no such table"**
-- Schema not initialized. Run: `sqlite3 ./sqlite-backup/puutarhakanta2005.sqlite < puutarhakanta2005_schema.sql`
+**Error: "NoSuchModuleError: Can't load plugin: sqlalchemy.dialects:postgres.psycopg2"**
+- Make sure `DATABASE_URL` starts with `postgresql+psycopg2://`.
 
-**Error: "database is locked"**
-- Another process is using the SQLite file
-- Stop the app and any other processes accessing `./sqlite-backup/puutarhakanta2005.sqlite`
-- Remove lock files: `rm ./sqlite-backup/puutarhakanta2005.sqlite-*`
-
-**Large queries are slow**
-- SQLite performs slower on large datasets. Consider switching to MySQL for production
-- Add indexes: See `puutarhakanta2005_schema.sql` for index definitions
-
-### MySQL Connection Errors
-
-**Error: "Can't connect to MySQL server"**
-- Ensure Docker container is running: `docker compose ps mysql`
-- Check credentials in `.env` match container setup
-- Verify MySQL is listening: `nc -zv 127.0.0.1 3306`
-
-**Error: "Access denied for user"**
-- Verify `DB_USER` and `DB_PASSWORD` in `.env`
-- Check user exists in MySQL: `mysql -u root -p -e "SELECT user FROM mysql.user;"`
-
-**Error: "Unknown database"**
-- Restore schema: `mysql -h127.0.0.1 -utarkastususer -ptarkastususer < puutarhakanta2005_schema.sql`
+**Error: `psql` import fails on the dump**
+- Rebuild the dump with `python migrate_sqlite_to_pg.py` and import the regenerated file.
+- Make sure the connection string in `.env` points to the target PostgreSQL database.
 
 ### Application Startup Issues
 
 **Error: "JWT token is invalid" or "SECRET_KEY not set"**
 - Set `SECRET_KEY` in `.env` (minimum 32 characters)
 - Restart the application after changing `.env`
-
-**App defaults to SQLite instead of MySQL**
-- Check that `DATABASE_URL` is not set (or contains SQLite path)
-- Verify database connection vars in `.env` are being loaded: `python3 -c "from app.core.config import DB_HOST; print(DB_HOST)"`
-
-## Switching Between SQLite and MySQL
-
-### From SQLite to MySQL
-
-```bash
-# 1. Set MySQL credentials in .env
-nano .env
-# DB_HOST=127.0.0.1
-# DB_PORT=3306
-# DB_NAME=puutarhakanta2005
-# DB_USER=tarkastususer
-# DB_PASSWORD=tarkastususer
-
-# 2. Initialize MySQL schema
-docker compose up -d mysql
-mysql -h127.0.0.1 -P3306 -utarkastususer -ptarkastususer puutarhakanta2005 < puutarhakanta2005_schema.sql
-
-# 3. Restart the app (it will auto-detect MySQL credentials)
-fastapi dev
-```
-
-### From MySQL to SQLite
-
-```bash
-# 1. Remove or comment out database vars in .env
-nano .env
-# DB_HOST=localhost  # Comment these out
-# DB_PORT=3306
-
-# 2. Initialize SQLite database
-mkdir -p ./sqlite-backup
-sqlite3 ./sqlite-backup/puutarhakanta2005.sqlite < puutarhakanta2005_schema.sql
-
-# 3. Restart the app (it will use SQLite by default)
-fastapi dev
-```
 
 ### Testing
 

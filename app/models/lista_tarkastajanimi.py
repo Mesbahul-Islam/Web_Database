@@ -1,5 +1,4 @@
-from sqlalchemy import Column, String, Table
-from sqlalchemy.dialects.mysql import INTEGER
+from sqlalchemy import Column, String, Table, Integer
 
 from .base import Base
 
@@ -8,7 +7,7 @@ class ListaTarkastajanimi(Base):
     __table__ = Table(
         "lista_tarkastajanimi",
         Base.metadata,
-        Column("id", INTEGER(11)),
+        Column("id", Integer),
         Column("nimi", String(255)),
         extend_existing=True,
     )

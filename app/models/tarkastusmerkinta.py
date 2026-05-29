@@ -2,7 +2,7 @@ from .base import Base
 from typing import Optional
 import datetime
 from sqlalchemy import Column, Date, ForeignKeyConstraint, Index, String, Table, Text, text
-from sqlalchemy.dialects.mysql import INTEGER, TINYINT
+from sqlalchemy import Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -11,7 +11,7 @@ class Tarkastusmerkinta(Base):
     __tablename__ = 'tarkastusmerkinta'
     __table_args__ = (ForeignKeyConstraint(['sijoituspaikan_nro'], ['sijoituspaikka.sijoituspaikan_nro'], name='tarkastusmerkinta_ibfk_1'), Index('IDX_Tarkastusmerkinta1', 'sijoituspaikan_nro'))
     # Tarkastusnro
-    tarkastusnro: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
+    tarkastusnro: Mapped[int] = mapped_column(Integer, primary_key=True)
     # Inspection date
     tarkastuspvm: Mapped[Optional[str]] = mapped_column(String(255))
     # Living individuals
@@ -23,7 +23,7 @@ class Tarkastusmerkinta(Base):
     # Plant remarks
     kasvin_huomautuksia: Mapped[Optional[str]] = mapped_column(Text)
     # Placement location number
-    sijoituspaikan_nro: Mapped[Optional[int]] = mapped_column(INTEGER(11))
+    sijoituspaikan_nro: Mapped[Optional[int]] = mapped_column(Integer)
     # New inspection date
     uus_tarkastuspvm: Mapped[Optional[datetime.date]] = mapped_column(Date)
     # Placement location

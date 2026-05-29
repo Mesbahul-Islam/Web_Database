@@ -8,3 +8,4 @@ puutarha_sqlite.sql
 docs/
 docker
 sqlite-backup
+db-backups

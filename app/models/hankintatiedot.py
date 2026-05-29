@@ -2,7 +2,7 @@ from .base import Base
 from typing import Optional
 import datetime
 from sqlalchemy import Column, Date, ForeignKeyConstraint, Index, String, Table, Text, text
-from sqlalchemy.dialects.mysql import INTEGER, TINYINT
+from sqlalchemy import Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -11,11 +11,11 @@ class Hankintatiedot(Base):
     __tablename__ = 'hankintatiedot'
     __table_args__ = (ForeignKeyConstraint(['lahettajanro'], ['lahettaja.lahettajanro'], name='hankintatiedot_ibfk_2'), ForeignKeyConstraint(['taksonin_nro'], ['taksoni.taksonin_nro'], name='hankintatiedot_ibfk_1'), Index('IDX_Hankintatiedot1', 'taksonin_nro'), Index('IDX_Hankintatiedot2', 'lahettajanro'), Index('hankintanumero', 'hankintanumero', unique=True))
     # Acquisition ID
-    hankintaID: Mapped[int] = mapped_column(INTEGER(11), primary_key=True)
+    hankintaID: Mapped[int] = mapped_column(Integer, primary_key=True)
     # Taxon number
-    taksonin_nro: Mapped[int] = mapped_column(INTEGER(11), nullable=False, server_default=text('0'))
+    taksonin_nro: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0'))
     # Sender number
-    lahettajanro: Mapped[int] = mapped_column(INTEGER(11), nullable=False, server_default=text('0'))
+    lahettajanro: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0'))
     # Acquisition number
     hankintanumero: Mapped[Optional[str]] = mapped_column(String(255))
     # Arrival date
@@ -43,13 +43,13 @@ class Hankintatiedot(Base):
     # Acquisition history
     hankintahistoria: Mapped[Optional[str]] = mapped_column(Text)
     # PUT flag
-    put: Mapped[Optional[int]] = mapped_column(TINYINT(1))
+    put: Mapped[Optional[int]] = mapped_column(Integer)
     # PUT value
     puttia: Mapped[Optional[str]] = mapped_column(String(255))
     # Number
-    numero: Mapped[Optional[int]] = mapped_column(INTEGER(11))
+    numero: Mapped[Optional[int]] = mapped_column(Integer)
     # Vuosiluku
-    vuosiluku: Mapped[Optional[int]] = mapped_column(INTEGER(11))
+    vuosiluku: Mapped[Optional[int]] = mapped_column(Integer)
     # Taxonomic family
     heimo: Mapped[Optional[str]] = mapped_column(String(255))
     # Sender or source
