@@ -12,4 +12,5 @@ router = APIRouter()
 @router.get("/", response_model=List[Schema])
 def read_all(request: Request, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     query = apply_filters(db.query(Model), Model, request.query_params)
+    query = query.filter(Model.paneeli.isnot(None))
     return query.offset(skip).limit(limit).all()
