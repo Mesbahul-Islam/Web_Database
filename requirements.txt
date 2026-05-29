@@ -5,6 +5,7 @@ pytest
 httpx
 pyjwt
 pwdlib
+pwdlib[argon2]
 gunicorn
 python-dotenv
 psycopg2-binary
