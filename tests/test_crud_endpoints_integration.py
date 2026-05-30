@@ -7,6 +7,10 @@ from uuid import uuid4
 import pytest
 from sqlalchemy import func, inspect
 
+from app.models.user import User, RoleEnum
+from app.security.utils import get_password_hash
+from app.security.token import create_access_token
+
 
 def _serialize_value(value):
     if isinstance(value, (datetime, date)):
@@ -100,7 +104,20 @@ def _pick_update_field(model, pk_name: str):
 
 
 def test_post_put_delete_endpoints(client, db_session):
+    username = f"crud-test-{uuid4().hex[:12]}"
+    user = User(
+        username=username,
+        password=get_password_hash("crud-test-password"),
+        role_name=RoleEnum.USER,
+    )
+    db_session.add(user)
+    db_session.commit()
+    token = create_access_token(data={"sub": username})
+    headers = {"Authorization": f"Bearer {token}"}
+
     for module_name, routes in _routes_by_module(client.app).items():
+        if module_name.endswith(".auth"):
+            continue
         post_route = _find_route(routes, "POST", requires_param=False)
         if post_route is None:
             continue
@@ -129,7 +146,7 @@ def test_post_put_delete_endpoints(client, db_session):
         payload[pk_col.name] = new_pk
         _apply_unique_overrides(payload, model)
 
-        response = client.post(post_route.path, json=payload)
+        response = client.post(post_route.path, json=payload, headers=headers)
         assert response.status_code in {200, 201}, f"POST {post_route.path} failed: {response.status_code}"
 
         update_col = _pick_update_field(model, pk_col.name)
@@ -141,9 +158,12 @@ def test_post_put_delete_endpoints(client, db_session):
                 update_payload[update_col.name] = update_payload[update_col.name] + 1
 
             put_path = _replace_path_param(put_route.path, put_route, str(new_pk))
-            response = client.put(put_path, json=update_payload)
+            response = client.put(put_path, json=update_payload, headers=headers)
             assert response.status_code == 200, f"PUT {put_path} failed: {response.status_code}"
 
         delete_path = _replace_path_param(delete_route.path, delete_route, str(new_pk))
-        response = client.delete(delete_path)
+        response = client.delete(delete_path, headers=headers)
         assert response.status_code in {200, 204}, f"DELETE {delete_path} failed: {response.status_code}"
+
+    db_session.delete(user)
+    db_session.commit()

@@ -45,6 +45,21 @@ def seeded_user(db_session):
     db_session.commit()
 
 
+@pytest.fixture()
+def admin_user(db_session):
+    user = User(
+        username="auth-admin-user",
+        password=get_password_hash("admin-password"),
+        role_name=RoleEnum.ADMIN,
+    )
+    db_session.add(user)
+    db_session.commit()
+    db_session.refresh(user)
+    yield user
+    db_session.delete(user)
+    db_session.commit()
+
+
 def test_login_returns_bearer_token(client, seeded_user):
     response = client.post(
         "/auth/token",
@@ -106,3 +121,46 @@ def test_users_me_rejects_expired_token(client, seeded_user):
 
     assert response.status_code == 401
     assert response.json()["detail"] == "Could not validate credentials"
+
+
+def test_admin_can_create_user(client, db_session, admin_user):
+    token = create_access_token(data={"sub": admin_user.username})
+
+    response = client.post(
+        "/auth/users",
+        headers={"Authorization": f"Bearer {token}"},
+        json={
+            "username": "new-user",
+            "password": "new-user-password",
+            "role_name": "user",
+        },
+    )
+
+    assert response.status_code == 201
+    body = response.json()
+    assert body["username"] == "new-user"
+    assert body["role_name"] == "user"
+
+    created = db_session.query(User).filter(User.username == "new-user").first()
+    assert created is not None
+    assert created.password != "new-user-password"
+
+    db_session.delete(created)
+    db_session.commit()
+
+
+def test_non_admin_cannot_create_user(client, seeded_user):
+    token = create_access_token(data={"sub": seeded_user.username})
+
+    response = client.post(
+        "/auth/users",
+        headers={"Authorization": f"Bearer {token}"},
+        json={
+            "username": "blocked-user",
+            "password": "blocked-password",
+            "role_name": "user",
+        },
+    )
+
+    assert response.status_code == 403
+    assert response.json()["detail"] == "Admin privileges required"
