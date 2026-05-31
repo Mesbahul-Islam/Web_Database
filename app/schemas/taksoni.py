@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional
+from typing import Optional, List
 from datetime import date, datetime
 
 class TaksoniBase(BaseModel):
@@ -43,3 +43,10 @@ class TaksoniCreate(TaksoniBase):
 
 class Taksoni(TaksoniBase):
     model_config = ConfigDict(from_attributes=True)
+
+class TaksoniPage(BaseModel):
+    items: List[Taksoni]
+    total: int
+    page: int
+    page_size: int
+    pages: int
