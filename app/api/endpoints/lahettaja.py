@@ -13,9 +13,14 @@ from app.schemas.lahettaja import Lahettaja as Schema, LahettajaCreate as Schema
 router = APIRouter()
 
 @router.get("/", response_model=List[Schema])
-def read_all(request: Request, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def read_all(request: Request, db: Session = Depends(get_db)):
     query = apply_filters(db.query(Model), Model, request.query_params)
-    return query.offset(skip).limit(limit).all()
+    return query.all()
+
+@router.get("/count", response_model=int)
+def count_items(request: Request, db: Session = Depends(get_db)):
+    query = apply_filters(db.query(Model), Model, request.query_params)
+    return query.count()
 
 @router.get("/{lahettajanro}", response_model=Schema)  # lahettajanro: sender number
 def read_one(lahettajanro: int, db: Session = Depends(get_db)):  # lahettajanro: sender number
