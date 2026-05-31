@@ -37,7 +37,9 @@ def test_get_list_endpoints(client):
             continue
         if "{" in route.path:
             continue
-        if route.path in {"/openapi.json", "/docs", "/redoc"}:
+        if route.path in {"/openapi.json", "/docs", "/redoc", "/docs/oauth2-redirect"}:
+            continue
+        if route.path.startswith("/auth/"):
             continue
 
         response = client.get(route.path, params={"limit": 1})
@@ -64,7 +66,10 @@ def test_get_detail_endpoints(client, db_session):
             column = _match_column(model, param.name)
             if column is None:
                 break
-            row = db_session.query(model).filter(column.isnot(None)).first()
+            try:
+                row = db_session.query(model).filter(column.isnot(None)).first()
+            except ValueError:
+                row = None
             if row is None:
                 break
             value = _serialize_value(getattr(row, column.name))

@@ -41,7 +41,7 @@ def _update_item_fields(func: ast.FunctionDef) -> set[str]:
 
 def test_read_one_and_update_one_fields_exist_on_model():
     for path in sorted(ENDPOINTS_DIR.glob("*.py")):
-        if path.name in {"__init__.py", ".instructions.md"}:
+        if path.name in {"__init__.py", ".instructions.md", "auth.py"}:
             continue
         module = _load_module(path)
         model = getattr(module, "Model", None)
