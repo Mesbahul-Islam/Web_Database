@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from app.api.query import apply_filters
+from app.cache import cached_list
 from app.database import get_db
 from app.models.lista_luonnonsuojeluarvo_suomessa import ListaLuonnonsuojeluarvoSuomessa as Model  # lista_luonnonsuojeluarvo_suomessa: list_nature_conservation_value_in_finland
 from app.schemas.lista_luonnonsuojeluarvo_suomessa import ListaLuonnonsuojeluarvoSuomessa as Schema  # lista_luonnonsuojeluarvo_suomessa: list_nature_conservation_value_in_finland
@@ -10,6 +11,7 @@ from app.schemas.lista_luonnonsuojeluarvo_suomessa import ListaLuonnonsuojeluarv
 router = APIRouter()
 
 @router.get("/", response_model=List[Schema])
+@cached_list("lista_luonnonsuojeluarvo_suomessa")
 def read_all(request: Request, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     query = apply_filters(db.query(Model), Model, request.query_params)
     return query.offset(skip).limit(limit).all()

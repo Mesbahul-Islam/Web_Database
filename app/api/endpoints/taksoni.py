@@ -5,6 +5,7 @@ from typing import List, Annotated
 
 from app.api.query import apply_filters
 from app.api.crud import create_item, update_item, delete_item
+from app.cache import cached_list, invalidate_endpoint_cache
 from app.database import get_db
 from app.security.utils import get_current_user
 from app.models.user import User
@@ -17,7 +18,9 @@ from app.schemas.taksoni import (
 
 router = APIRouter()
 
+@router.get("", response_model=SchemaPage, include_in_schema=False)
 @router.get("/", response_model=SchemaPage)
+@cached_list("taksoni")
 def read_all(
     request: Request,
     page: int = Query(1, ge=1),
@@ -51,12 +54,15 @@ def read_one(taksonin_nro: int, db: Session = Depends(get_db)):  # taksonin_nro:
 
 @router.post("/", response_model=Schema, status_code=201)
 async def create_one(payload: SchemaCreate, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):
+    invalidate_endpoint_cache("taksoni")
     return await create_item(payload, db, Model)
 
 @router.put("/{taksonin_nro}", response_model=Schema)
 async def update_one(taksonin_nro: int, payload: SchemaCreate, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):
+    invalidate_endpoint_cache("taksoni")
     return await update_item(payload, db, Model, "taksonin_nro", taksonin_nro)
 
 @router.delete("/{taksonin_nro}", status_code=204)
 async def delete_one(taksonin_nro: int, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):
+    invalidate_endpoint_cache("taksoni")
     await delete_item(db, Model, "taksonin_nro", taksonin_nro)

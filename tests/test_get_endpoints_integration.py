@@ -6,6 +6,8 @@ from datetime import date, datetime
 import pytest
 from sqlalchemy import inspect
 
+from app.models.taksoni import Taksoni
+
 
 def _serialize_value(value):
     if isinstance(value, (datetime, date)):
@@ -45,6 +47,64 @@ def test_get_list_endpoints(client):
         response = client.get(route.path, params={"limit": 1})
         assert response.status_code == 200, f"{route.path} returned {response.status_code}"
         assert isinstance(response.json(), list), f"{route.path} did not return a list"
+
+
+def test_taksoni_list_endpoint_without_trailing_slash(client):
+    response = client.get("/taksoni", params={"page": 1, "page_size": 25, "search": "en"})
+    assert response.status_code == 200
+    assert not response.history
+    assert response.url.path == "/taksoni"
+
+
+def test_taksoni_search_filters_results(client, db_session):
+    item = db_session.query(Taksoni).filter(Taksoni.tieteellinen_nimi.isnot(None)).first()
+    assert item is not None
+
+    search_term = item.tieteellinen_nimi[:4].strip()
+    assert search_term
+
+    response = client.get("/taksoni", params={"page": 1, "page_size": 25, "search": search_term})
+    assert response.status_code == 200
+
+    payload = response.json()
+    items = payload["items"]
+    assert items
+
+    for result in items:
+        string_values = [value for value in result.values() if isinstance(value, str)]
+        assert any(search_term.lower() in value.lower() for value in string_values)
+
+
+def test_taksoni_search_matches_genus_or_species(client, db_session):
+    item = (
+        db_session.query(Taksoni)
+        .filter((Taksoni.suku.isnot(None)) | (Taksoni.laji.isnot(None)))
+        .first()
+    )
+    assert item is not None
+
+    search_source = item.suku or item.laji
+    assert search_source is not None
+
+    search_term = search_source[:4].strip()
+    assert search_term
+
+    response = client.get("/taksoni", params={"page": 1, "page_size": 25, "search": search_term})
+    assert response.status_code == 200
+
+    payload = response.json()
+    assert payload["items"]
+
+    matched = False
+    for result in payload["items"]:
+        if any(
+            search_term.lower() in str(result.get(field, "")).lower()
+            for field in ("suku", "laji", "tieteellinen_nimi")
+        ):
+            matched = True
+            break
+
+    assert matched
 
 
 def test_get_detail_endpoints(client, db_session):

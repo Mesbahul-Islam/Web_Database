@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from app.api.query import apply_filters
+from app.cache import cached_list
 from app.database import get_db
 from app.models.maailman_levinneisyysalue import MaailmanLevinneisyysalue as Model  # maailman_levinneisyysalue: world_distribution_area
 from app.schemas.maailman_levinneisyysalue import MaailmanLevinneisyysalue as Schema  # maailman_levinneisyysalue: world_distribution_area
@@ -10,6 +11,7 @@ from app.schemas.maailman_levinneisyysalue import MaailmanLevinneisyysalue as Sc
 router = APIRouter()
 
 @router.get("/", response_model=List[Schema])
+@cached_list("maailman_levinneisyysalue")
 def read_all(request: Request, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     query = apply_filters(db.query(Model), Model, request.query_params)
     return query.offset(skip).limit(limit).all()
