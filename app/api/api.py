@@ -159,3 +159,18 @@ api_router.include_router(ymparistoindikaattoriluonne_router, prefix="/ymparisto
 from app.api.endpoints.auth import router as auth_router  # auth: authentication
 api_router.include_router(auth_router, prefix="/auth", tags=["Auth"])  # auth:
 
+
+### Cache Monitoring ###
+
+from fastapi import APIRouter as CacheRouter
+from app.cache import get_cache_stats
+
+cache_router = CacheRouter()
+
+@cache_router.get("/cache-stats", tags=["System"])
+def cache_stats():
+    """Get current cache statistics and status."""
+    return get_cache_stats()
+
+api_router.include_router(cache_router)
+

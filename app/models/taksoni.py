@@ -9,6 +9,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 class Taksoni(Base):
     # Taxon
     __tablename__ = 'taksoni'
+    __searchable_columns__ = ('tieteellinen_nimi', 'suku', 'laji')
     __table_args__ = (ForeignKeyConstraint(['jarjestysnumero'], ['heimo.jarjestysnumero'], name='taksoni_ibfk_1'), ForeignKeyConstraint(['viitenro'], ['viite.viitenro'], name='taksoni_ibfk_2'), Index('IDX_Taksoni1', 'jarjestysnumero'), Index('IDX_Taksoni2', 'viitenro'))
     # Taxon number
     taksonin_nro: Mapped[int] = mapped_column(Integer, primary_key=True)

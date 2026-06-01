@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from app.api.query import apply_filters
+from app.cache import cached_list
 from app.database import get_db
 from app.models.lista_alkuperainen_kasvupaikka import ListaAlkuperainenKasvupaikka as Model  # lista_alkuperainen_kasvupaikka: list original growing site
 from app.schemas.lista_alkuperainen_kasvupaikka import ListaAlkuperainenKasvupaikka as Schema  # lista_alkuperainen_kasvupaikka: list original growing site
@@ -10,6 +11,7 @@ from app.schemas.lista_alkuperainen_kasvupaikka import ListaAlkuperainenKasvupai
 router = APIRouter()
 
 @router.get("/", response_model=List[Schema])
+@cached_list("lista_alkuperainen_kasvupaikka")
 def read_all(request: Request, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     query = apply_filters(db.query(Model), Model, request.query_params)
     return query.offset(skip).limit(limit).all()
