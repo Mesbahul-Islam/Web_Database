@@ -24,7 +24,7 @@ class Tarkastusmerkinta(Base):
     kasvin_huomautuksia: Mapped[Optional[str]] = mapped_column(Text)
     # Placement location number
     sijoituspaikan_nro: Mapped[Optional[int]] = mapped_column(Integer)
-    # New inspection date
-    uus_tarkastuspvm: Mapped[Optional[datetime.date]] = mapped_column(Date)
+    # New inspection date (stored as string to handle malformed dates in database)
+    uus_tarkastuspvm: Mapped[Optional[str]] = mapped_column(String(255))
     # Placement location
     sijoituspaikka: Mapped[Optional['Sijoituspaikka']] = relationship('Sijoituspaikka', back_populates='tarkastusmerkinta')

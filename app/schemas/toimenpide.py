@@ -7,7 +7,7 @@ class ToimenpideBase(BaseModel):
     pvm: Optional[str]
     toimenpide: Optional[str]
     hankintaID: Optional[int]
-    uus_pvm: Optional[date]
+    uus_pvm: Optional[str]
 
 class ToimenpideCreate(ToimenpideBase):
     pass

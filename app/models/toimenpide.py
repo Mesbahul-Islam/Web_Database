@@ -18,7 +18,7 @@ class Toimenpide(Base):
     toimenpide: Mapped[Optional[str]] = mapped_column(String(255))
     # Acquisition ID
     hankintaID: Mapped[Optional[int]] = mapped_column(Integer)
-    # New date
-    uus_pvm: Mapped[Optional[datetime.date]] = mapped_column(Date)
+    # New date (stored as string to handle malformed dates in database)
+    uus_pvm: Mapped[Optional[str]] = mapped_column(String(255))
     # Acquisition data
     hankintatiedot: Mapped[Optional['Hankintatiedot']] = relationship('Hankintatiedot', back_populates='toimenpide')
