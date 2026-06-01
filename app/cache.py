@@ -116,11 +116,21 @@ def cached_list(endpoint: str) -> Callable:
         @wraps(func)
         def wrapper(*args, **kwargs) -> Any:
             # Extract query params from request
+            # Request can be in args or kwargs
             request = None
-            for arg in args:
-                if hasattr(arg, 'query_params'):
-                    request = arg
+            
+            # Check kwargs first (FastAPI dependency injection)
+            for key, value in kwargs.items():
+                if hasattr(value, 'query_params'):
+                    request = value
                     break
+            
+            # Check args if not found in kwargs
+            if not request:
+                for arg in args:
+                    if hasattr(arg, 'query_params'):
+                        request = arg
+                        break
             
             if not request:
                 # Can't cache without request object, call directly
