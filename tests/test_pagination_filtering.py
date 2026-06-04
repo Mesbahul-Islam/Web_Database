@@ -569,8 +569,13 @@ class TestOpenAPIFilterParams:
         # page must be integer, not required
         assert params["page"]["schema"]["type"] == "integer"
         assert params["page"].get("required", False) is False
-        # search must be string, not required
-        assert params["search"]["schema"]["type"] == "string"
+        # search is Optional[str] — schema is either {"type":"string"} or {"anyOf":[...]}
+        search_schema = params["search"]["schema"]
+        is_string = search_schema.get("type") == "string" or any(
+            s.get("type") == "string"
+            for s in search_schema.get("anyOf", [])
+        )
+        assert is_string, f"search param schema does not include string type: {search_schema}"
         assert params["search"].get("required", False) is False
 
     def test_all_paginated_list_endpoints_have_search_param(self, client):

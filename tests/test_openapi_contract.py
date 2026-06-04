@@ -20,6 +20,8 @@ def test_openapi_has_all_routes():
             continue
         if route.path.startswith("/docs") or route.path.startswith("/redoc") or route.path == "/openapi.json":
             continue
+        if not getattr(route, "include_in_schema", True):
+            continue
 
         path_item = paths.get(route.path)
         assert path_item is not None, f"Missing OpenAPI path for {route.path}"

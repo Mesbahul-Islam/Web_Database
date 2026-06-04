@@ -47,8 +47,8 @@ def test_get_list_endpoints(client):
         response = client.get(route.path, params={"page": 1, "page_size": 1})
         assert response.status_code == 200, f"{route.path} returned {response.status_code}"
         body = response.json()
-        # Endpoints return either a SchemaPage envelope or a plain list
-        assert isinstance(body, (list, dict)), f"{route.path} returned unexpected type"
+        # Endpoints return a SchemaPage envelope, a plain list, or an integer (count)
+        assert isinstance(body, (list, dict, int)), f"{route.path} returned unexpected type"
         if isinstance(body, dict):
             assert "items" in body or "total" in body, (
                 f"{route.path} returned dict without 'items' or 'total'"
