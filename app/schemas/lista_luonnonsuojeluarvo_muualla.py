@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional
+from typing import List, Optional
 from datetime import date, datetime
 
 class ListaLuonnonsuojeluarvoMuuallaBase(BaseModel):
@@ -12,3 +12,10 @@ class ListaLuonnonsuojeluarvoMuuallaCreate(ListaLuonnonsuojeluarvoMuuallaBase):
 
 class ListaLuonnonsuojeluarvoMuualla(ListaLuonnonsuojeluarvoMuuallaBase):
     model_config = ConfigDict(from_attributes=True)
+
+class ListaLuonnonsuojeluarvoMuuallaPage(BaseModel):
+    items: List[ListaLuonnonsuojeluarvoMuualla]
+    total: int
+    page: int
+    page_size: int
+    pages: int

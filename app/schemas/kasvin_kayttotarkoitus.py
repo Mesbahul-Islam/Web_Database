@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional
+from typing import List, Optional
 from datetime import date, datetime
 
 class KasvinKayttotarkoitusBase(BaseModel):
@@ -15,3 +15,10 @@ class KasvinKayttotarkoitusCreate(KasvinKayttotarkoitusBase):
 
 class KasvinKayttotarkoitus(KasvinKayttotarkoitusBase):
     model_config = ConfigDict(from_attributes=True)
+
+class KasvinKayttotarkoitusPage(BaseModel):
+    items: List[KasvinKayttotarkoitus]
+    total: int
+    page: int
+    page_size: int
+    pages: int

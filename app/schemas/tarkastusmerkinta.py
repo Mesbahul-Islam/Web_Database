@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional
+from typing import List, Optional
 
 class TarkastusmerkintaBase(BaseModel):
     tarkastusnro: int
@@ -16,3 +16,10 @@ class TarkastusmerkintaCreate(TarkastusmerkintaBase):
 
 class Tarkastusmerkinta(TarkastusmerkintaBase):
     model_config = ConfigDict(from_attributes=True)
+
+class TarkastusmerkintaPage(BaseModel):
+    items: List[Tarkastusmerkinta]
+    total: int
+    page: int
+    page_size: int
+    pages: int

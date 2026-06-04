@@ -1,20 +1,37 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Query
+from math import ceil
 from sqlalchemy.orm import Session
 from typing import List
 
-from app.api.query import apply_filters
+from app.api.query import apply_filters, make_filter_dep
 from app.cache import cached_list
 from app.database import get_db
 from app.models.suunniteltu_kasvupaikka import SuunniteltuKasvupaikka as Model  # suunniteltu_kasvupaikka: planned_growing_site
-from app.schemas.suunniteltu_kasvupaikka import SuunniteltuKasvupaikka as Schema  # suunniteltu_kasvupaikka: planned_growing_site
+from app.schemas.suunniteltu_kasvupaikka import SuunniteltuKasvupaikka as Schema, SuunniteltuKasvupaikkaPage as SchemaPage  # suunniteltu_kasvupaikka: planned_growing_site
 
 router = APIRouter()
 
-@router.get("/", response_model=List[Schema])
+@router.get("/", response_model=SchemaPage)
 @cached_list("suunniteltu_kasvupaikka")
-def read_all(request: Request, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def read_all(
+    request: Request,
+    page: int = Query(1, ge=1),
+    page_size: int = Query(200, ge=1),
+    _filters: dict = Depends(make_filter_dep(Model)),
+    db: Session = Depends(get_db),
+):
     query = apply_filters(db.query(Model), Model, request.query_params)
-    return query.offset(skip).limit(limit).all()
+    total = query.count()
+    offset = (page - 1) * page_size
+    items = query.offset(offset).limit(page_size).all()
+    pages = ceil(total / page_size) if total else 0
+    return SchemaPage(
+        items=items,
+        total=total,
+        page=page,
+        page_size=page_size,
+        pages=pages,
+    )
 
 @router.get("/{taksonin_nro}", response_model=Schema)  # taksonin_nro: taxon number
 def read_one(taksonin_nro: str, db: Session = Depends(get_db)):  # taksonin_nro: taxon number

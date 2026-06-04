@@ -1,23 +1,40 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Query
+from math import ceil
 from sqlalchemy.orm import Session
 from typing import List, Annotated
 
-from app.api.query import apply_filters
+from app.api.query import apply_filters, make_filter_dep
 from app.api.crud import create_item, update_item, delete_item
 from app.cache import cached_list, invalidate_endpoint_cache
 from app.database import get_db
 from app.security.utils import get_current_user
 from app.models.user import User
 from app.models.kasvatustietoja import Kasvatustietoja as Model  # kasvatustietoja: cultivation_data
-from app.schemas.kasvatustietoja import Kasvatustietoja as Schema, KasvatustietojaCreate as SchemaCreate  # kasvatustietoja: cultivation_data
+from app.schemas.kasvatustietoja import Kasvatustietoja as Schema, KasvatustietojaCreate as SchemaCreate, KasvatustietojaPage as SchemaPage  # kasvatustietoja: cultivation_data
 
 router = APIRouter()
 
-@router.get("/", response_model=List[Schema])
+@router.get("/", response_model=SchemaPage)
 @cached_list("kasvatustietoja")
-def read_all(request: Request, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def read_all(
+    request: Request,
+    page: int = Query(1, ge=1),
+    page_size: int = Query(200, ge=1),
+    _filters: dict = Depends(make_filter_dep(Model)),
+    db: Session = Depends(get_db),
+):
     query = apply_filters(db.query(Model), Model, request.query_params)
-    return query.offset(skip).limit(limit).all()
+    total = query.count()
+    offset = (page - 1) * page_size
+    items = query.offset(offset).limit(page_size).all()
+    pages = ceil(total / page_size) if total else 0
+    return SchemaPage(
+        items=items,
+        total=total,
+        page=page,
+        page_size=page_size,
+        pages=pages,
+    )
 
 @router.get("/{hankintaID}", response_model=Schema)  # hankintaID: acquisition id
 def read_one(hankintaID: str, db: Session = Depends(get_db)):  # hankintaID: acquisition id
@@ -25,11 +42,6 @@ def read_one(hankintaID: str, db: Session = Depends(get_db)):  # hankintaID: acq
     if not item:
         raise HTTPException(status_code=404, detail="Not found")
     return item
-
-@router.get("/hankinta/{hankintaID}", response_model=List[Schema])  # hankintaID: acquisition id
-def read_and_filter_by_hankintaID(hankintaID: str, request: Request, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):  # hankintaID: acquisition id
-    query = apply_filters(db.query(Model).filter(Model.hankintaID == hankintaID), Model, request.query_params)  # hankintaID: acquisition id
-    return query.offset(skip).limit(limit).all()
 
 @router.post("/", response_model=Schema, status_code=201)
 async def create_one(payload: SchemaCreate, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):

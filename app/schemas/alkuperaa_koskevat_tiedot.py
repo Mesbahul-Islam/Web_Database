@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional
+from typing import List, Optional
 from datetime import date, datetime
 
 class AlkuperaaKoskevatTiedotBase(BaseModel):
@@ -28,3 +28,10 @@ class AlkuperaaKoskevatTiedotCreate(AlkuperaaKoskevatTiedotBase):
 
 class AlkuperaaKoskevatTiedot(AlkuperaaKoskevatTiedotBase):
     model_config = ConfigDict(from_attributes=True)
+
+class AlkuperaaKoskevatTiedotPage(BaseModel):
+    items: List[AlkuperaaKoskevatTiedot]
+    total: int
+    page: int
+    page_size: int
+    pages: int  

@@ -1,6 +1,8 @@
+import inspect
 from datetime import datetime
-from typing import Any
+from typing import Any, Optional
 
+from fastapi import Query
 from sqlalchemy import or_
 from starlette.datastructures import QueryParams
 from sqlalchemy.orm import noload
@@ -51,10 +53,49 @@ def apply_filters(query, model, params: QueryParams):
             query = query.filter(or_(*searchable_columns))
 
     for key, value in params.multi_items():  # alue: area
-        if key in {"skip", "limit", "search"}:
+        if key in {"skip", "limit", "search", "page", "page_size"}:
             continue
         if not hasattr(model, key):
             continue
         column = getattr(model, key)
         query = query.filter(column == _coerce_value(column, value))  # alue: area
     return query
+
+
+def make_filter_dep(Model):
+    """
+    Returns a FastAPI dependency whose signature lists every filterable column on
+    the model as an Optional query param.  FastAPI reads the signature to generate
+    OpenAPI docs; the actual filtering is still done by apply_filters via
+    request.query_params, so this dependency's return value is intentionally unused.
+    """
+    params = [
+        inspect.Parameter(
+            "search",
+            inspect.Parameter.POSITIONAL_OR_KEYWORD,
+            default=Query(None, description="Full-text search across all string fields"),
+            annotation=Optional[str],
+        )
+    ]
+
+    for col in Model.__table__.columns:
+        try:
+            py_type = col.type.python_type
+        except Exception:
+            continue
+        if py_type not in (int, str, float, bool):
+            continue
+        params.append(
+            inspect.Parameter(
+                col.key,
+                inspect.Parameter.POSITIONAL_OR_KEYWORD,
+                default=Query(None, description=f"Filter by {col.key}"),
+                annotation=Optional[py_type],
+            )
+        )
+
+    def filter_dep(**kwargs):
+        return {k: v for k, v in kwargs.items() if v is not None}
+
+    filter_dep.__signature__ = inspect.Signature(params)
+    return filter_dep

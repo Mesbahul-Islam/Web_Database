@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional
+from typing import List, Optional
 from datetime import date, datetime
 
 class SynonyymiBase(BaseModel):
@@ -15,3 +15,10 @@ class SynonyymiCreate(SynonyymiBase):
 
 class Synonyymi(SynonyymiBase):
     model_config = ConfigDict(from_attributes=True)
+
+class SynonyymiPage(BaseModel):
+    items: List[Synonyymi]
+    total: int
+    page: int
+    page_size: int
+    pages: int

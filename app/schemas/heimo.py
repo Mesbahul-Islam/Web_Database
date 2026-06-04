@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional
+from typing import List, Optional
 from datetime import date, datetime
 
 class HeimoBase(BaseModel):
@@ -22,3 +22,10 @@ class HeimoCreate(HeimoBase):
 
 class Heimo(HeimoBase):
     model_config = ConfigDict(from_attributes=True)
+
+class HeimoPage(BaseModel):
+    items: List[Heimo]
+    total: int
+    page: int
+    page_size: int
+    pages: int
