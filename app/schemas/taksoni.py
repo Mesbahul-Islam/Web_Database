@@ -39,7 +39,7 @@ class TaksoniBase(BaseModel):
     risteymaviite: Optional[str]
 
 class TaksoniCreate(TaksoniBase):
-    pass
+    taksonin_nro: Optional[int] = None
 
 class Taksoni(TaksoniBase):
     model_config = ConfigDict(from_attributes=True)

@@ -1,23 +1,40 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Query
+from math import ceil
 from sqlalchemy.orm import Session
 from typing import List, Annotated
 
-from app.api.query import apply_filters
+from app.api.query import apply_filters, make_filter_dep
 from app.api.crud import create_item, update_item, delete_item
 from app.cache import cached_list, invalidate_endpoint_cache
 from app.database import get_db
 from app.security.utils import get_current_user
 from app.models.user import User
 from app.models.naytetietoja import Naytetietoja as Model  # naytetietoja: specimen_information
-from app.schemas.naytetietoja import Naytetietoja as Schema, NaytetietojaCreate as SchemaCreate  # naytetietoja: specimen_information
+from app.schemas.naytetietoja import Naytetietoja as Schema, NaytetietojaCreate as SchemaCreate, NaytetietojaPage as SchemaPage  # naytetietoja: specimen_information
 
 router = APIRouter()
 
-@router.get("/", response_model=List[Schema])
+@router.get("/", response_model=SchemaPage)
 @cached_list("naytetietoja")
-def read_all(request: Request, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def read_all(
+    request: Request,
+    page: int = Query(1, ge=1),
+    page_size: int = Query(200, ge=1),
+    _filters: dict = Depends(make_filter_dep(Model)),
+    db: Session = Depends(get_db),
+):
     query = apply_filters(db.query(Model), Model, request.query_params)
-    return query.offset(skip).limit(limit).all()
+    total = query.count()
+    offset = (page - 1) * page_size
+    items = query.offset(offset).limit(page_size).all()
+    pages = ceil(total / page_size) if total else 0
+    return SchemaPage(
+        items=items,
+        total=total,
+        page=page,
+        page_size=page_size,
+        pages=pages,
+    )
 
 @router.get("/{hankintaid}", response_model=Schema)  # hankintaid: acquisition id
 def read_one(hankintaid: str, db: Session = Depends(get_db)):  # hankintaid: acquisition id
@@ -40,4 +57,3 @@ async def update_one(naytteen_nro: int, payload: SchemaCreate, current_user: Ann
 async def delete_one(naytteen_nro: int, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):
     invalidate_endpoint_cache("naytetietoja")
     await delete_item(db, Model, "naytteen_nro", naytteen_nro)
-

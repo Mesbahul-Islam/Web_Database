@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional
+from typing import List, Optional
 from datetime import date, datetime
 
 class ListaHakuBase(BaseModel):
@@ -11,3 +11,10 @@ class ListaHakuCreate(ListaHakuBase):
 
 class ListaHaku(ListaHakuBase):
     model_config = ConfigDict(from_attributes=True)
+
+class ListaHakuPage(BaseModel):
+    items: List[ListaHaku]
+    total: int
+    page: int
+    page_size: int
+    pages: int

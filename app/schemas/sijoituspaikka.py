@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional
+from typing import List, Optional
 from datetime import date, datetime
 
 class SijoituspaikkaBase(BaseModel):
@@ -18,3 +18,10 @@ class SijoituspaikkaCreate(SijoituspaikkaBase):
 
 class Sijoituspaikka(SijoituspaikkaBase):
     model_config = ConfigDict(from_attributes=True)
+
+class SijoituspaikkaPage(BaseModel):
+    items: List[Sijoituspaikka]
+    total: int
+    page: int
+    page_size: int
+    pages: int

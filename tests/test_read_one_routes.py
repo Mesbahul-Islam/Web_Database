@@ -26,6 +26,9 @@ class _FakeQuery:
     def limit(self, *args, **kwargs):
         return self
 
+    def count(self):
+        return 0
+
     def all(self):
         return []
 

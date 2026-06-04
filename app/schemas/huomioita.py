@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional
+from typing import List, Optional
 from datetime import date, datetime
 
 class HuomioitaBase(BaseModel):
@@ -11,3 +11,10 @@ class HuomioitaCreate(HuomioitaBase):
 
 class Huomioita(HuomioitaBase):
     model_config = ConfigDict(from_attributes=True)
+
+class HuomioitaPage(BaseModel):
+    items: List[Huomioita]
+    total: int
+    page: int
+    page_size: int
+    pages: int

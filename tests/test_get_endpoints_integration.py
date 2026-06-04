@@ -39,14 +39,20 @@ def test_get_list_endpoints(client):
             continue
         if "{" in route.path:
             continue
-        if route.path in {"/openapi.json", "/docs", "/redoc", "/docs/oauth2-redirect"}:
+        if route.path in {"/openapi.json", "/docs", "/redoc", "/docs/oauth2-redirect", "/cache-stats"}:
             continue
         if route.path.startswith("/auth/"):
             continue
 
-        response = client.get(route.path, params={"limit": 1})
+        response = client.get(route.path, params={"page": 1, "page_size": 1})
         assert response.status_code == 200, f"{route.path} returned {response.status_code}"
-        assert isinstance(response.json(), list), f"{route.path} did not return a list"
+        body = response.json()
+        # Endpoints return a SchemaPage envelope, a plain list, or an integer (count)
+        assert isinstance(body, (list, dict, int)), f"{route.path} returned unexpected type"
+        if isinstance(body, dict):
+            assert "items" in body or "total" in body, (
+                f"{route.path} returned dict without 'items' or 'total'"
+            )
 
 
 def test_taksoni_list_endpoint_without_trailing_slash(client):

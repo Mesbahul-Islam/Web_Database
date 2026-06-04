@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional
+from typing import List, Optional
 from datetime import date, datetime
 
 class ListaStatusBase(BaseModel):
@@ -12,3 +12,10 @@ class ListaStatusCreate(ListaStatusBase):
 
 class ListaStatus(ListaStatusBase):
     model_config = ConfigDict(from_attributes=True)
+
+class ListaStatusPage(BaseModel):
+    items: List[ListaStatus]
+    total: int
+    page: int
+    page_size: int
+    pages: int

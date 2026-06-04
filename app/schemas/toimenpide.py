@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional
+from typing import List, Optional
 from datetime import date, datetime
 
 class ToimenpideBase(BaseModel):
@@ -14,3 +14,10 @@ class ToimenpideCreate(ToimenpideBase):
 
 class Toimenpide(ToimenpideBase):
     model_config = ConfigDict(from_attributes=True)
+
+class ToimenpidePage(BaseModel):
+    items: List[Toimenpide]
+    total: int
+    page: int
+    page_size: int
+    pages: int

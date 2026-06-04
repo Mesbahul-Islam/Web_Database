@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional
+from typing import List, Optional
 from datetime import date, datetime
 
 class ListaAlkuperainenLevinneisyysBase(BaseModel):
@@ -14,3 +14,10 @@ class ListaAlkuperainenLevinneisyysCreate(ListaAlkuperainenLevinneisyysBase):
 
 class ListaAlkuperainenLevinneisyys(ListaAlkuperainenLevinneisyysBase):
     model_config = ConfigDict(from_attributes=True)
+
+class ListaAlkuperainenLevinneisyysPage(BaseModel):
+    items: List[ListaAlkuperainenLevinneisyys]
+    total: int
+    page: int
+    page_size: int
+    pages: int
