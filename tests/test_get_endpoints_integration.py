@@ -39,9 +39,9 @@ def test_get_list_endpoints(client):
             continue
         if "{" in route.path:
             continue
-        if route.path in {"/openapi.json", "/docs", "/redoc", "/docs/oauth2-redirect", "/cache-stats"}:
+        if route.path in {"/openapi.json", "/docs", "/redoc", "/docs/oauth2-redirect", "/api/cache-stats"}:
             continue
-        if route.path.startswith("/auth/"):
+        if route.path.startswith("/api/auth/"):
             continue
 
         response = client.get(route.path, params={"page": 1, "page_size": 1})
@@ -56,10 +56,10 @@ def test_get_list_endpoints(client):
 
 
 def test_taksoni_list_endpoint_without_trailing_slash(client):
-    response = client.get("/taksoni", params={"page": 1, "page_size": 25, "search": "en"})
+    response = client.get("/api/taksoni", params={"page": 1, "page_size": 25, "search": "en"})
     assert response.status_code == 200
     assert not response.history
-    assert response.url.path == "/taksoni"
+    assert response.url.path == "/api/taksoni"
 
 
 def test_taksoni_search_filters_results(client, db_session):
@@ -69,7 +69,7 @@ def test_taksoni_search_filters_results(client, db_session):
     search_term = item.tieteellinen_nimi[:4].strip()
     assert search_term
 
-    response = client.get("/taksoni", params={"page": 1, "page_size": 25, "search": search_term})
+    response = client.get("/api/taksoni", params={"page": 1, "page_size": 25, "search": search_term})
     assert response.status_code == 200
 
     payload = response.json()
@@ -95,7 +95,7 @@ def test_taksoni_search_matches_genus_or_species(client, db_session):
     search_term = search_source[:4].strip()
     assert search_term
 
-    response = client.get("/taksoni", params={"page": 1, "page_size": 25, "search": search_term})
+    response = client.get("/api/taksoni", params={"page": 1, "page_size": 25, "search": search_term})
     assert response.status_code == 200
 
     payload = response.json()

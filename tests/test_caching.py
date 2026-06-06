@@ -138,7 +138,7 @@ class TestCacheHitsMisses:
         """First request to an endpoint should hit the database (cache miss)."""
         initial_cache_size = len(list_cache)
         
-        response = client.get("/taksoni/", params={"page": 1, "page_size": 5})
+        response = client.get("/api/taksoni/", params={"page": 1, "page_size": 5})
         
         assert response.status_code == 200
         assert len(list_cache) > initial_cache_size
@@ -147,12 +147,12 @@ class TestCacheHitsMisses:
     def test_second_identical_request_cache_hit(self, client):
         """Second request with identical parameters should hit the cache."""
         # First request (cache miss)
-        response1 = client.get("/taksoni/", params={"page": 1, "page_size": 5})
+        response1 = client.get("/api/taksoni/", params={"page": 1, "page_size": 5})
         cache_size_after_first = len(list_cache)
         data1 = response1.json()
         
         # Second request (cache hit)
-        response2 = client.get("/taksoni/", params={"page": 1, "page_size": 5})
+        response2 = client.get("/api/taksoni/", params={"page": 1, "page_size": 5})
         cache_size_after_second = len(list_cache)
         data2 = response2.json()
         
@@ -165,11 +165,11 @@ class TestCacheHitsMisses:
     def test_different_params_cache_miss(self, client):
         """Requests with different parameters should result in separate cache entries."""
         # First query
-        response1 = client.get("/taksoni/", params={"page": 1, "page_size": 5})
+        response1 = client.get("/api/taksoni/", params={"page": 1, "page_size": 5})
         cache_size_after_first = len(list_cache)
         
         # Second query with different params
-        response2 = client.get("/taksoni/", params={"page": 2, "page_size": 5})
+        response2 = client.get("/api/taksoni/", params={"page": 2, "page_size": 5})
         cache_size_after_second = len(list_cache)
         
         assert response1.status_code == 200
@@ -180,13 +180,13 @@ class TestCacheHitsMisses:
     def test_search_param_creates_separate_cache_entry(self, client):
         """Search parameter should create a separate cache entry."""
         # Request without search
-        response1 = client.get("/taksoni/", params={"page": 1, "page_size": 5})
+        response1 = client.get("/api/taksoni/", params={"page": 1, "page_size": 5})
         cache_size_1 = len(list_cache)
         data1 = response1.json()
         total1 = data1["total"]
         
         # Request with search
-        response2 = client.get("/taksoni/", params={"page": 1, "page_size": 5, "search": "Rosa"})
+        response2 = client.get("/api/taksoni/", params={"page": 1, "page_size": 5, "search": "Rosa"})
         cache_size_2 = len(list_cache)
         data2 = response2.json()
         total2 = data2["total"]
@@ -207,7 +207,7 @@ class TestCacheInvalidation:
         # Here we verify the mechanism works:
         
         # Warm the cache
-        client.get("/lahettaja/", params={"limit": 5})
+        client.get("/api/lahettaja/", params={"limit": 5})
         lahettaja_cache_before = [k for k in list_cache.keys() if k.startswith("lahettaja:")]
         assert len(lahettaja_cache_before) > 0
         
@@ -223,7 +223,7 @@ class TestCacheInvalidation:
         # Here we verify the mechanism works:
         
         # Warm the cache
-        client.get("/taksoni/", params={"page": 1, "page_size": 5})
+        client.get("/api/taksoni/", params={"page": 1, "page_size": 5})
         taksoni_cache_before = [k for k in list_cache.keys() if k.startswith("taksoni:")]
         assert len(taksoni_cache_before) > 0
         
@@ -235,7 +235,7 @@ class TestCacheInvalidation:
     def test_delete_invalidates_endpoint_cache(self, client, db_session, admin_user):
         """DELETE operation should invalidate all cache entries for that endpoint."""
         # Warm the cache
-        response1 = client.get("/lahettaja/", params={"limit": 5})
+        response1 = client.get("/api/lahettaja/", params={"limit": 5})
         assert response1.status_code == 200
         
         # Get a lahettaja to delete (or create one first)
@@ -259,9 +259,9 @@ class TestCacheInvalidation:
     def test_invalidate_endpoint_cache_removes_all_entries(self, client):
         """invalidate_endpoint_cache should remove all cache entries for an endpoint."""
         # Create cache entries for multiple queries on same endpoint
-        client.get("/taksoni/", params={"page": 1, "page_size": 5})
-        client.get("/taksoni/", params={"page": 2, "page_size": 5})
-        client.get("/taksoni/", params={"page": 1, "page_size": 10})
+        client.get("/api/taksoni/", params={"page": 1, "page_size": 5})
+        client.get("/api/taksoni/", params={"page": 2, "page_size": 5})
+        client.get("/api/taksoni/", params={"page": 1, "page_size": 10})
         
         taksoni_entries_before = [k for k in list_cache.keys() if k.startswith("taksoni:")]
         assert len(taksoni_entries_before) >= 3
@@ -280,7 +280,7 @@ class TestCacheStatistics:
     def test_get_cache_stats_returns_correct_format(self, client):
         """Cache stats should return properly formatted dict with required fields."""
         # Warm the cache
-        client.get("/taksoni/", params={"page": 1, "page_size": 5})
+        client.get("/api/taksoni/", params={"page": 1, "page_size": 5})
         
         stats = get_cache_stats()
         
@@ -298,9 +298,9 @@ class TestCacheStatistics:
     def test_cache_stats_size_matches_entries(self, client):
         """Cache stats size should match actual number of entries."""
         # Create multiple cache entries
-        client.get("/taksoni/", params={"page": 1, "page_size": 5})
-        client.get("/taksoni/", params={"page": 2, "page_size": 5})
-        client.get("/lahettaja/", params={"limit": 10})
+        client.get("/api/taksoni/", params={"page": 1, "page_size": 5})
+        client.get("/api/taksoni/", params={"page": 2, "page_size": 5})
+        client.get("/api/lahettaja/", params={"limit": 10})
         
         stats = get_cache_stats()
         
@@ -325,8 +325,8 @@ class TestCacheStatistics:
 
     def test_cache_stats_keys_list_contains_valid_keys(self, client):
         """Cache stats keys should be list of valid cache keys."""
-        client.get("/taksoni/", params={"page": 1, "page_size": 5})
-        client.get("/lahettaja/", params={"limit": 10})
+        client.get("/api/taksoni/", params={"page": 1, "page_size": 5})
+        client.get("/api/lahettaja/", params={"limit": 10})
         
         stats = get_cache_stats()
         keys = stats["keys"]
@@ -342,7 +342,7 @@ class TestCacheEndpointIntegration:
 
     def test_cache_stats_endpoint_exists(self, client):
         """GET /cache-stats endpoint should exist and return stats."""
-        response = client.get("/cache-stats")
+        response = client.get("/api/cache-stats")
         
         assert response.status_code == 200
         data = response.json()
@@ -354,13 +354,13 @@ class TestCacheEndpointIntegration:
     def test_cache_stats_endpoint_reflects_current_cache_state(self, client):
         """Cache stats endpoint should reflect current cache state."""
         # Warm cache
-        client.get("/taksoni/", params={"page": 1, "page_size": 5})
-        client.get("/lahettaja/", params={"limit": 10})
+        client.get("/api/taksoni/", params={"page": 1, "page_size": 5})
+        client.get("/api/lahettaja/", params={"limit": 10})
         
         initial_size = len(list_cache)
         
         # Get stats
-        response = client.get("/cache-stats")
+        response = client.get("/api/cache-stats")
         data = response.json()
         
         assert data["size"] == initial_size
@@ -373,7 +373,7 @@ class TestListEndpointCaching:
     def test_taksoni_endpoint_caches_results(self, client):
         """Taksoni endpoint should cache results."""
         # First request
-        response1 = client.get("/taksoni/", params={"page": 1, "page_size": 5})
+        response1 = client.get("/api/taksoni/", params={"page": 1, "page_size": 5})
         assert response1.status_code == 200
         data1 = response1.json()
         
@@ -382,7 +382,7 @@ class TestListEndpointCaching:
         assert len(taksoni_entries) >= 1
         
         # Second request should return same data
-        response2 = client.get("/taksoni/", params={"page": 1, "page_size": 5})
+        response2 = client.get("/api/taksoni/", params={"page": 1, "page_size": 5})
         assert response2.status_code == 200
         data2 = response2.json()
         
@@ -391,7 +391,7 @@ class TestListEndpointCaching:
     def test_lahettaja_endpoint_caches_results(self, client):
         """Lahettaja endpoint should cache results."""
         # Request
-        response = client.get("/lahettaja/", params={"limit": 10})
+        response = client.get("/api/lahettaja/", params={"limit": 10})
         assert response.status_code == 200
         
         # Cache should have entry
@@ -401,7 +401,7 @@ class TestListEndpointCaching:
     def test_heimo_endpoint_caches_results(self, client):
         """Heimo endpoint should cache results."""
         # Request
-        response = client.get("/heimo/", params={"limit": 10})
+        response = client.get("/api/heimo/", params={"limit": 10})
         assert response.status_code == 200
         
         # Cache should have entry
@@ -411,11 +411,11 @@ class TestListEndpointCaching:
     def test_search_caching(self, client):
         """Search results should be cached separately."""
         # Request without search
-        response1 = client.get("/taksoni/", params={"page": 1, "page_size": 5})
+        response1 = client.get("/api/taksoni/", params={"page": 1, "page_size": 5})
         cache_size_1 = len(list_cache)
         
         # Request with search
-        response2 = client.get("/taksoni/", params={"page": 1, "page_size": 5, "search": "Rosa"})
+        response2 = client.get("/api/taksoni/", params={"page": 1, "page_size": 5, "search": "Rosa"})
         cache_size_2 = len(list_cache)
         
         # Different cache entries
@@ -429,9 +429,9 @@ class TestCacheMultipleEndpoints:
 
     def test_multiple_endpoints_maintain_separate_caches(self, client):
         """Multiple endpoints should maintain separate cache entries."""
-        client.get("/taksoni/", params={"page": 1, "page_size": 5})
-        client.get("/lahettaja/", params={"limit": 10})
-        client.get("/heimo/", params={"limit": 10})
+        client.get("/api/taksoni/", params={"page": 1, "page_size": 5})
+        client.get("/api/lahettaja/", params={"limit": 10})
+        client.get("/api/heimo/", params={"limit": 10})
         
         taksoni_entries = [k for k in list_cache.keys() if k.startswith("taksoni:")]
         lahettaja_entries = [k for k in list_cache.keys() if k.startswith("lahettaja:")]
@@ -444,8 +444,8 @@ class TestCacheMultipleEndpoints:
 
     def test_invalidate_one_endpoint_preserves_others(self, client):
         """Invalidating one endpoint should not affect other endpoints."""
-        client.get("/taksoni/", params={"page": 1, "page_size": 5})
-        client.get("/lahettaja/", params={"limit": 10})
+        client.get("/api/taksoni/", params={"page": 1, "page_size": 5})
+        client.get("/api/lahettaja/", params={"limit": 10})
         
         # Invalidate taksoni
         invalidate_endpoint_cache("taksoni")
@@ -458,9 +458,9 @@ class TestCacheMultipleEndpoints:
 
     def test_invalidate_all_cache_clears_everything(self, client):
         """invalidate_all_cache should clear all entries."""
-        client.get("/taksoni/", params={"page": 1, "page_size": 5})
-        client.get("/lahettaja/", params={"limit": 10})
-        client.get("/heimo/", params={"limit": 10})
+        client.get("/api/taksoni/", params={"page": 1, "page_size": 5})
+        client.get("/api/lahettaja/", params={"limit": 10})
+        client.get("/api/heimo/", params={"limit": 10})
         
         assert len(list_cache) >= 3
         

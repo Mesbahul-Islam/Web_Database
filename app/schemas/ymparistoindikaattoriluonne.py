@@ -5,9 +5,9 @@ from datetime import date, datetime
 class YmparistoindikaattoriluonneBase(BaseModel):
     indikaattorin_nro: int
     taksonin_nro: int
-    ymparistoindikaattoriluonne: Optional[str]
-    ymparistoindikaattorin_selite: Optional[str]
-    viitenro: Optional[int]
+    ymparistoindikaattoriluonne: Optional[str] = None
+    ymparistoindikaattorin_selite: Optional[str] = None
+    viitenro: Optional[int] = None
 
 class YmparistoindikaattoriluonneCreate(YmparistoindikaattoriluonneBase):
     pass

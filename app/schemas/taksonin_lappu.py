@@ -4,8 +4,8 @@ from datetime import date, datetime
 
 class TaksoninLappuBase(BaseModel):
     Lappu_nro: int
-    Lappu_teksti: Optional[str]
-    taksonin_nro: Optional[int]
+    Lappu_teksti: Optional[str] = None
+    taksonin_nro: Optional[int] = None
 
 class TaksoninLappuCreate(TaksoninLappuBase):
     pass

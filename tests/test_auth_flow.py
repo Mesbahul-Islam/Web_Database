@@ -62,7 +62,7 @@ def admin_user(db_session):
 
 def test_login_returns_bearer_token(client, seeded_user):
     response = client.post(
-        "/auth/token",
+        "/api/auth/token",
         data={"username": seeded_user.username, "password": "secret-password"},
     )
 
@@ -75,7 +75,7 @@ def test_login_returns_bearer_token(client, seeded_user):
 
 def test_login_rejects_invalid_password(client, seeded_user):
     response = client.post(
-        "/auth/token",
+        "/api/auth/token",
         data={"username": seeded_user.username, "password": "wrong-password"},
     )
 
@@ -85,13 +85,13 @@ def test_login_rejects_invalid_password(client, seeded_user):
 
 def test_users_me_requires_valid_bearer_token(client, seeded_user):
     login_response = client.post(
-        "/auth/token",
+        "/api/auth/token",
         data={"username": seeded_user.username, "password": "secret-password"},
     )
     token = login_response.json()["access_token"]
 
     response = client.get(
-        "/auth/users/me",
+        "/api/auth/users/me",
         headers={"Authorization": f"Bearer {token}"},
     )
 
@@ -102,7 +102,7 @@ def test_users_me_requires_valid_bearer_token(client, seeded_user):
 
 
 def test_users_me_rejects_missing_token(client):
-    response = client.get("/auth/users/me")
+    response = client.get("/api/auth/users/me")
 
     assert response.status_code == 401
     assert response.json()["detail"] == "Not authenticated"
@@ -115,7 +115,7 @@ def test_users_me_rejects_expired_token(client, seeded_user):
     )
 
     response = client.get(
-        "/auth/users/me",
+        "/api/auth/users/me",
         headers={"Authorization": f"Bearer {expired_token}"},
     )
 
@@ -127,7 +127,7 @@ def test_admin_can_create_user(client, db_session, admin_user):
     token = create_access_token(data={"sub": admin_user.username})
 
     response = client.post(
-        "/auth/users",
+        "/api/auth/users",
         headers={"Authorization": f"Bearer {token}"},
         json={
             "username": "new-user",
@@ -153,7 +153,7 @@ def test_non_admin_cannot_create_user(client, seeded_user):
     token = create_access_token(data={"sub": seeded_user.username})
 
     response = client.post(
-        "/auth/users",
+        "/api/auth/users",
         headers={"Authorization": f"Bearer {token}"},
         json={
             "username": "blocked-user",

@@ -4,8 +4,8 @@ from datetime import date, datetime
 
 class KoeBase(BaseModel):
     id: int
-    i: Optional[int]
-    t: Optional[str]
+    i: Optional[int] = None
+    t: Optional[str] = None
 
 class KoeCreate(KoeBase):
     pass

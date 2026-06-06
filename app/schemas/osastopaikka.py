@@ -4,11 +4,11 @@ from datetime import date, datetime
 
 class OsastopaikkaBase(BaseModel):
     osaston_numero: int
-    osaston_koodi: Optional[str]
-    osaston_nimi: Optional[str]
-    kasvin_status: Optional[str]
-    kasvin_huomautuksia: Optional[str]
-    hankintaID: Optional[int]
+    osaston_koodi: Optional[str] = None
+    osaston_nimi: Optional[str] = None
+    kasvin_status: Optional[str] = None
+    kasvin_huomautuksia: Optional[str] = None
+    hankintaID: Optional[int] = None
 
 class OsastopaikkaCreate(OsastopaikkaBase):
     pass

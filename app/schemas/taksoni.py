@@ -4,39 +4,39 @@ from datetime import date, datetime
 
 class TaksoniBase(BaseModel):
     taksonin_nro: int
-    tieteellinen_nimi: str
-    suku: Optional[str]
-    suvun_auktori: Optional[str]
-    laji: Optional[str]
-    lajin_auktori: Optional[str]
-    alataso_1: Optional[str]
-    alatason_1_viite: Optional[int]
-    alataso_2: Optional[str]
-    alatason_2_auktori: Optional[str]
-    alatason_1_auktori: Optional[str]
-    alatason_2_viite: Optional[int]
-    alataso_3: Optional[str]
-    alatason_3_auktori: Optional[str]
-    alatason_3_viite: Optional[int]
-    alataso_4: Optional[str]
-    alatason_4_auktori: Optional[str]
-    alatason_4_viite: Optional[int]
-    alataso_5: Optional[str]
-    alatason_5_auktori: Optional[str]
-    alatason_5_viite: Optional[int]
-    risteymatiedot: Optional[str]
-    risteymatietojen_auktori: Optional[str]
-    viimeinen_paivityspvm: Optional[str]
-    muita_tietoja: Optional[str]
-    jarjestysnumero: Optional[int]
-    viitenro: Optional[int]
-    lajin_viite: Optional[str]
-    lajin_viite2: Optional[str]
-    yleis_viite: Optional[str]
-    vap_yleis_viite: Optional[str]
-    put: Optional[int]
-    puttia: Optional[str]
-    risteymaviite: Optional[str]
+    tieteellinen_nimi: Optional[str] = None
+    suku: Optional[str] = None
+    suvun_auktori: Optional[str] = None
+    laji: Optional[str] = None
+    lajin_auktori: Optional[str] = None
+    alataso_1: Optional[str] = None
+    alatason_1_viite: Optional[int] = None
+    alataso_2: Optional[str] = None
+    alatason_2_auktori: Optional[str] = None
+    alatason_1_auktori: Optional[str] = None
+    alatason_2_viite: Optional[int] = None
+    alataso_3: Optional[str] = None
+    alatason_3_auktori: Optional[str] = None
+    alatason_3_viite: Optional[int] = None
+    alataso_4: Optional[str] = None
+    alatason_4_auktori: Optional[str] = None
+    alatason_4_viite: Optional[int] = None
+    alataso_5: Optional[str] = None
+    alatason_5_auktori: Optional[str] = None
+    alatason_5_viite: Optional[int] = None
+    risteymatiedot: Optional[str] = None
+    risteymatietojen_auktori: Optional[str] = None
+    viimeinen_paivityspvm: Optional[str] = None
+    muita_tietoja: Optional[str] = None
+    jarjestysnumero: Optional[int] = None
+    viitenro: Optional[int] = None
+    lajin_viite: Optional[str] = None
+    lajin_viite2: Optional[str] = None
+    yleis_viite: Optional[str] = None
+    vap_yleis_viite: Optional[str] = None
+    put: Optional[int] = None
+    puttia: Optional[str] = None
+    risteymaviite: Optional[str] = None
 
 class TaksoniCreate(TaksoniBase):
     taksonin_nro: Optional[int] = None

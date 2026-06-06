@@ -5,10 +5,10 @@ from datetime import date, datetime
 class KasvinKayttotarkoitusBase(BaseModel):
     kayttonro: int
     taksonin_nro: int
-    kayton_tunnus: Optional[str]
-    kaytto: Optional[str]
-    selite: Optional[str]
-    viitenro: Optional[int]
+    kayton_tunnus: Optional[str] = None
+    kaytto: Optional[str] = None
+    selite: Optional[str] = None
+    viitenro: Optional[int] = None
 
 class KasvinKayttotarkoitusCreate(KasvinKayttotarkoitusBase):
     pass

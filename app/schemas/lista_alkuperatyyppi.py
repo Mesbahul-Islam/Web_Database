@@ -1,9 +1,9 @@
 from pydantic import BaseModel, ConfigDict
-from typing import List
+from typing import List, Optional
 from datetime import date, datetime
 
 class ListaAlkuperatyyppiBase(BaseModel):
-    nimi: str
+    nimi: Optional[str] = None
     id: int
 
 class ListaAlkuperatyyppiCreate(ListaAlkuperatyyppiBase):

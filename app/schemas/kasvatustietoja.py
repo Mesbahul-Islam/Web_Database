@@ -5,12 +5,12 @@ from datetime import date, datetime
 class KasvatustietojaBase(BaseModel):
     lisatietojen_nro_kasvatus: int
     hankintaID: int
-    siemenpankki: Optional[str]
-    siemenia_jaljella: Optional[str]
-    siementen_varastoimistapa: Optional[str]
-    tutkimus: Optional[str]
-    huomautuksia: Optional[str]
-    pvm: Optional[str]
+    siemenpankki: Optional[str] = None
+    siemenia_jaljella: Optional[str] = None
+    siementen_varastoimistapa: Optional[str] = None
+    tutkimus: Optional[str] = None
+    huomautuksia: Optional[str] = None
+    pvm: Optional[str] = None
 
 class KasvatustietojaCreate(KasvatustietojaBase):
     pass

@@ -4,18 +4,18 @@ from datetime import date, datetime
 
 class HeimoBase(BaseModel):
     jarjestysnumero: int
-    nimi: Optional[str]
-    synonyymi: Optional[str]
-    numero: Optional[str]
-    lahko: Optional[str]
-    lahkonnumero: Optional[str]
-    alaluokka: Optional[str]
-    alaluokannumero: Optional[str]
-    luokka: Optional[str]
-    luokannumero: Optional[str]
-    paaryhma: Optional[str]
-    paaryhmannumero: Optional[str]
-    suom_nimi: Optional[str]
+    nimi: Optional[str] = None
+    synonyymi: Optional[str] = None
+    numero: Optional[str] = None
+    lahko: Optional[str] = None
+    lahkonnumero: Optional[str] = None
+    alaluokka: Optional[str] = None
+    alaluokannumero: Optional[str] = None
+    luokka: Optional[str] = None
+    luokannumero: Optional[str] = None
+    paaryhma: Optional[str] = None
+    paaryhmannumero: Optional[str] = None
+    suom_nimi: Optional[str] = None
 
 class HeimoCreate(HeimoBase):
     pass

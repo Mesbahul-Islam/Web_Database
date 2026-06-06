@@ -4,7 +4,7 @@ from datetime import date, datetime
 
 class ListaHakuBase(BaseModel):
     id: int
-    nimi: Optional[str]
+    nimi: Optional[str] = None
 
 class ListaHakuCreate(ListaHakuBase):
     pass

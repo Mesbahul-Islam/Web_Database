@@ -5,13 +5,13 @@ from datetime import date, datetime
 class SijoituspaikkaBase(BaseModel):
     sijoituspaikan_nro: int
     osaston_numero: int
-    sijoituspvm: Optional[str]
-    ruutu: Optional[str]
-    sijoituspaikan_nimi: Optional[str]
-    kasvin_status: Optional[str]
-    sijoituspaikan_koordinaatit: Optional[str]
-    sijoituspaikka_vanhat_tiedot: Optional[str]
-    kasvin_huomautuksia: Optional[str]
+    sijoituspvm: Optional[str] = None
+    ruutu: Optional[str] = None
+    sijoituspaikan_nimi: Optional[str] = None
+    kasvin_status: Optional[str] = None
+    sijoituspaikan_koordinaatit: Optional[str] = None
+    sijoituspaikka_vanhat_tiedot: Optional[str] = None
+    kasvin_huomautuksia: Optional[str] = None
 
 class SijoituspaikkaCreate(SijoituspaikkaBase):
     pass

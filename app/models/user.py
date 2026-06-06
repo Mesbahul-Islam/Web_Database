@@ -1,6 +1,6 @@
 import enum
 from .base import Base
-from typing import Annotated
+from typing import Annotated, Optional
 from sqlalchemy.orm import mapped_column, Mapped
 from sqlalchemy import Enum as SQLEnum, String, Integer
 
@@ -14,7 +14,7 @@ class RoleEnum(str, enum.Enum):
 class User(Base):
     __tablename__ = 'users'
     # User ID
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[Optional[int]] = mapped_column(Integer, primary_key=True, autoincrement=True)
     # Username
     username: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     # Password

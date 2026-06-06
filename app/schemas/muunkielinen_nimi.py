@@ -5,10 +5,10 @@ from datetime import date, datetime
 class MuunkielinenNimiBase(BaseModel):
     nimen_nro: int
     taksonin_nro: int
-    nimi: Optional[str]
-    kieli: Optional[str]
-    viitenro: Optional[int]
-    viite_2: Optional[int]
+    nimi: Optional[str] = None
+    kieli: Optional[str] = None
+    viitenro: Optional[int] = None
+    viite_2: Optional[int] = None
 
 class MuunkielinenNimiCreate(MuunkielinenNimiBase):
     pass

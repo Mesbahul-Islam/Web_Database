@@ -4,8 +4,8 @@ from datetime import date, datetime
 
 class ListaMillaisenasaatuBase(BaseModel):
     ID: int
-    NIMI: Optional[str]
-    KOODI: Optional[str]
+    NIMI: Optional[str] = None
+    KOODI: Optional[str] = None
 
 class ListaMillaisenasaatuCreate(ListaMillaisenasaatuBase):
     pass

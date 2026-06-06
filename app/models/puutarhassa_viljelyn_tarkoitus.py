@@ -11,7 +11,7 @@ class PuutarhassaViljelynTarkoitus(Base):
     __tablename__ = 'puutarhassa_viljelyn_tarkoitus'
     __table_args__ = (ForeignKeyConstraint(['hankintaID'], ['hankintatiedot.hankintaID'], name='puutarhassa_viljelyn_tarkoitus_ibfk_1'), Index('IDX_Puutarhassa_viljelyn_tarkoitus1', 'hankintaID'))
     # Viljely number
-    viljely_nro: Mapped[int] = mapped_column(Integer, primary_key=True)
+    viljely_nro: Mapped[Optional[int]] = mapped_column(Integer, primary_key=True, autoincrement=True)
     # Acquisition ID
     hankintaID: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0'))
     # Garden cultivation purpose

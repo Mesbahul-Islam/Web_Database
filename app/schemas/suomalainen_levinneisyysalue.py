@@ -5,10 +5,10 @@ from datetime import date, datetime
 class SuomalainenLevinneisyysalueBase(BaseModel):
     levinneisyysalueen_nro: int
     taksonin_nro: int
-    levinneisyysalue: Optional[str]
-    levinneisyysalueen_tarkenne: Optional[str]
-    alkuperainen_vai_tulokas: Optional[str]
-    viitenro: Optional[int]
+    levinneisyysalue: Optional[str] = None
+    levinneisyysalueen_tarkenne: Optional[str] = None
+    alkuperainen_vai_tulokas: Optional[str] = None
+    viitenro: Optional[int] = None
 
 class SuomalainenLevinneisyysalueCreate(SuomalainenLevinneisyysalueBase):
     pass

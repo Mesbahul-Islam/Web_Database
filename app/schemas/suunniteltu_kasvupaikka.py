@@ -5,8 +5,8 @@ from datetime import date, datetime
 class SuunniteltuKasvupaikkaBase(BaseModel):
     kasvupaikan_nro: int
     taksonin_nro: int
-    osasto: Optional[str]
-    sijoituspaikka: Optional[str]
+    osasto: Optional[str] = None
+    sijoituspaikka: Optional[str] = None
 
 class SuunniteltuKasvupaikkaCreate(SuunniteltuKasvupaikkaBase):
     pass

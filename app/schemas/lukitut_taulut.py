@@ -4,8 +4,8 @@ from datetime import date, datetime
 
 class LukitutTaulutBase(BaseModel):
     kayttajan_tunnus: str
-    taulun_nimi: Optional[str]
-    avainkentta: Optional[str]
+    taulun_nimi: Optional[str] = None
+    avainkentta: Optional[str] = None
 
 class LukitutTaulutCreate(LukitutTaulutBase):
     pass
