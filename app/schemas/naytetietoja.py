@@ -4,16 +4,16 @@ from datetime import date, datetime
 
 class NaytetietojaBase(BaseModel):
     naytteen_nro: int
-    naytteen_tyyppi: Optional[str]
-    naytteen_sijainti: Optional[str]
-    naytteen_tiedot: Optional[str]
-    naytteen_keraaja: Optional[str]
-    naytteen_paivays: Optional[str]
-    hankintaID: Optional[int]
-    sijainnin_selite: Optional[str]
-    viitenro: Optional[int]
-    viitteen_selite: Optional[str]
-    uus_naytteen_paivays: Optional[date]
+    naytteen_tyyppi: Optional[str] = None
+    naytteen_sijainti: Optional[str] = None
+    naytteen_tiedot: Optional[str] = None
+    naytteen_keraaja: Optional[str] = None
+    naytteen_paivays: Optional[str] = None
+    hankintaID: Optional[int] = None
+    sijainnin_selite: Optional[str] = None
+    viitenro: Optional[int] = None
+    viitteen_selite: Optional[str] = None
+    uus_naytteen_paivays: Optional[date] = None
 
 class NaytetietojaCreate(NaytetietojaBase):
     pass

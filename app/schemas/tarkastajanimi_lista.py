@@ -4,8 +4,8 @@ from datetime import date, datetime
 
 class TarkastajanimiListaBase(BaseModel):
     id: int
-    lyhenne: Optional[str]
-    nimi: Optional[str]
+    lyhenne: Optional[str] = None
+    nimi: Optional[str] = None
 
 class TarkastajanimiListaCreate(TarkastajanimiListaBase):
     pass

@@ -5,9 +5,9 @@ from datetime import date, datetime
 class KansainvalisetSopimuksetBase(BaseModel):
     sopimus_id: int
     taksonin_nro: int
-    Sopimuksen_nimi: Optional[str]
-    selite: Optional[str]
-    viitenro: Optional[int]
+    Sopimuksen_nimi: Optional[str] = None
+    selite: Optional[str] = None
+    viitenro: Optional[int] = None
 
 class KansainvalisetSopimuksetCreate(KansainvalisetSopimuksetBase):
     pass

@@ -4,15 +4,15 @@ from datetime import date, datetime
 
 class ViiteBase(BaseModel):
     viitenro: int
-    viitteen_lyhenne: Optional[str]
-    tekija: Optional[str]
-    kirjan_nimi: Optional[str]
-    kirja_selite: Optional[str]
-    kustantaja: Optional[str]
-    painos: Optional[str]
-    vuosi: Optional[str]
-    ISBN: Optional[str]
-    sijainti: Optional[str]
+    viitteen_lyhenne: Optional[str] = None
+    tekija: Optional[str] = None
+    kirjan_nimi: Optional[str] = None
+    kirja_selite: Optional[str] = None
+    kustantaja: Optional[str] = None
+    painos: Optional[str] = None
+    vuosi: Optional[str] = None
+    ISBN: Optional[str] = None
+    sijainti: Optional[str] = None
 
 class ViiteCreate(ViiteBase):
     pass

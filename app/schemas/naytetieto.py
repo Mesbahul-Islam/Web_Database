@@ -5,14 +5,14 @@ from datetime import date, datetime
 class NaytetietoBase(BaseModel):
     naytteen_nro: int
     taksonin_nro: int
-    tyyppi: Optional[str]
-    sijainti: Optional[str]
-    tiedot: Optional[str]
-    keraaja: Optional[str]
-    paivays: Optional[str]
-    viitenro: Optional[int]
-    sijainnin_selite: Optional[str]
-    viitteen_selite: Optional[str]
+    tyyppi: Optional[str] = None
+    sijainti: Optional[str] = None
+    tiedot: Optional[str] = None
+    keraaja: Optional[str] = None
+    paivays: Optional[str] = None
+    viitenro: Optional[int] = None
+    sijainnin_selite: Optional[str] = None
+    viitteen_selite: Optional[str] = None
 
 class NaytetietoCreate(NaytetietoBase):
     pass

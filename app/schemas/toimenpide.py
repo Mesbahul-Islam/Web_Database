@@ -4,10 +4,10 @@ from datetime import date, datetime
 
 class ToimenpideBase(BaseModel):
     toimenpide_nro: int
-    pvm: Optional[str]
-    toimenpide: Optional[str]
-    hankintaID: Optional[int]
-    uus_pvm: Optional[str]
+    pvm: Optional[str] = None
+    toimenpide: Optional[str] = None
+    hankintaID: Optional[int] = None
+    uus_pvm: Optional[str] = None
 
 class ToimenpideCreate(ToimenpideBase):
     pass

@@ -4,8 +4,8 @@ from datetime import date, datetime
 
 class ListaKestaaSeuraaviaTorjuntaAineitaBase(BaseModel):
     id: int
-    koodi: Optional[str]
-    nimi: Optional[str]
+    koodi: Optional[str] = None
+    nimi: Optional[str] = None
 
 class ListaKestaaSeuraaviaTorjuntaAineitaCreate(ListaKestaaSeuraaviaTorjuntaAineitaBase):
     pass

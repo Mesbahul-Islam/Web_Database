@@ -4,7 +4,7 @@ from datetime import date, datetime
 
 class HuomoitaBase(BaseModel):
     paneeli: str
-    huom: Optional[str]
+    huom: Optional[str] = None
 
 class HuomoitaCreate(HuomoitaBase):
     pass

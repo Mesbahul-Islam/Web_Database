@@ -4,8 +4,8 @@ from datetime import date, datetime
 
 class ListaLisaystapaBase(BaseModel):
     id: int
-    koodi: Optional[str]
-    nimi: Optional[str]
+    koodi: Optional[str] = None
+    nimi: Optional[str] = None
 
 class ListaLisaystapaCreate(ListaLisaystapaBase):
     pass

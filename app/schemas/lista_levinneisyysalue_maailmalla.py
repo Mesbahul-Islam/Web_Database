@@ -4,10 +4,10 @@ from datetime import date, datetime
 
 class ListaLevinneisyysalueMaailmallaBase(BaseModel):
     ID: int
-    NIMI: Optional[str]
-    KOODI: Optional[str]
-    LYHENNE: Optional[str]
-    NUMERO: Optional[str]
+    NIMI: Optional[str] = None
+    KOODI: Optional[str] = None
+    LYHENNE: Optional[str] = None
+    NUMERO: Optional[str] = None
 
 class ListaLevinneisyysalueMaailmallaCreate(ListaLevinneisyysalueMaailmallaBase):
     pass

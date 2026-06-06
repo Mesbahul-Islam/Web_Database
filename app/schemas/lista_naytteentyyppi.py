@@ -4,8 +4,8 @@ from datetime import date, datetime
 
 class ListaNaytteentyyppiBase(BaseModel):
     id: int
-    nimi: Optional[str]
-    koodi: Optional[str]
+    nimi: Optional[str] = None
+    koodi: Optional[str] = None
 
 class ListaNaytteentyyppiCreate(ListaNaytteentyyppiBase):
     pass

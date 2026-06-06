@@ -4,7 +4,7 @@ from datetime import date, datetime
 
 class ListaRauhoituksetBase(BaseModel):
     id: int
-    nimi: Optional[str]
+    nimi: Optional[str] = None
 
 class ListaRauhoituksetCreate(ListaRauhoituksetBase):
     pass

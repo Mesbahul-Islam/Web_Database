@@ -4,10 +4,10 @@ from datetime import date, datetime
 
 class KayttajatiedotBase(BaseModel):
     id: int
-    kayttajan_tunnus: Optional[str]
-    kayttajan_nimi: Optional[str]
-    kayttajan_taso: Optional[int]
-    lisatietoja: Optional[str]
+    kayttajan_tunnus: Optional[str] = None
+    kayttajan_nimi: Optional[str] = None
+    kayttajan_taso: Optional[int] = None
+    lisatietoja: Optional[str] = None
 
 class KayttajatiedotCreate(KayttajatiedotBase):
     pass

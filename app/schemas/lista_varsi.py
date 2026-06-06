@@ -4,8 +4,8 @@ from datetime import date, datetime
 
 class ListaVarsiBase(BaseModel):
     ID: int
-    NIMI: Optional[str]
-    KOODI: Optional[str]
+    NIMI: Optional[str] = None
+    KOODI: Optional[str] = None
 
 class ListaVarsiCreate(ListaVarsiBase):
     pass

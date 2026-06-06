@@ -4,9 +4,9 @@ from datetime import date, datetime
 
 class EikaytossalistaKasvupaikanTyyppiBase(BaseModel):
     ID: int
-    NIMI: Optional[str]
-    KOODI: Optional[str]
-    NUMERO: Optional[str]
+    NIMI: Optional[str] = None
+    KOODI: Optional[str] = None
+    NUMERO: Optional[str] = None
 
 class EikaytossalistaKasvupaikanTyyppiCreate(EikaytossalistaKasvupaikanTyyppiBase):
     pass

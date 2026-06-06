@@ -4,7 +4,7 @@ from datetime import date, datetime
 
 class ListaLahettajantyyppiBase(BaseModel):
     id: int
-    nimi: Optional[str]
+    nimi: Optional[str] = None
 
 class ListaLahettajantyyppiCreate(ListaLahettajantyyppiBase):
     pass

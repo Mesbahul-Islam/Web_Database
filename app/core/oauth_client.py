@@ -18,6 +18,6 @@ if _APP_ENV_FILE.exists():
     load_dotenv(_APP_ENV_FILE)
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
 
 

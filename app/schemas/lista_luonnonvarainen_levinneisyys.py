@@ -4,11 +4,11 @@ from datetime import date, datetime
 
 class ListaLuonnonvarainenLevinneisyysBase(BaseModel):
     ID: int
-    NIMI: Optional[str]
-    KOODI: Optional[str]
-    LYHENNE: Optional[str]
-    NUMEROKOODI: Optional[str]
-    NUMERO: Optional[str]
+    NIMI: Optional[str] = None
+    KOODI: Optional[str] = None
+    LYHENNE: Optional[str] = None
+    NUMEROKOODI: Optional[str] = None
+    NUMERO: Optional[str] = None
 
 class ListaLuonnonvarainenLevinneisyysCreate(ListaLuonnonvarainenLevinneisyysBase):
     pass

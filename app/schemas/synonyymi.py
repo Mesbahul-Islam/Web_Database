@@ -5,10 +5,10 @@ from datetime import date, datetime
 class SynonyymiBase(BaseModel):
     synonyymin_nro: int
     taksonin_nro: int
-    nimi: Optional[str]
-    auktori: Optional[str]
-    viitenro: Optional[int]
-    viite_2: Optional[int]
+    nimi: Optional[str] = None
+    auktori: Optional[str] = None
+    viitenro: Optional[int] = None
+    viite_2: Optional[int] = None
 
 class SynonyymiCreate(SynonyymiBase):
     pass
