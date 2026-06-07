@@ -11,7 +11,7 @@ class Osastopaikka(Base):
     __tablename__ = 'osastopaikka'
     __table_args__ = (ForeignKeyConstraint(['hankintaID'], ['hankintatiedot.hankintaID'], name='osastopaikka_ibfk_1'), Index('IDX_Osastopaikka1', 'hankintaID'))
     # Section number
-    osaston_numero: Mapped[int] = mapped_column(Integer, primary_key=True)
+    osaston_numero: Mapped[Optional[int]] = mapped_column(Integer, primary_key=True, autoincrement=True)
     # Section code
     osaston_koodi: Mapped[Optional[str]] = mapped_column(String(255))
     # Section name

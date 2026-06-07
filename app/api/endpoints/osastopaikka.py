@@ -45,19 +45,37 @@ def read_one(osaston_numero: int, db: Session = Depends(get_db)):  # osaston_num
         raise HTTPException(status_code=404, detail="Not found")
     return item
 
+from app.models.hankintatiedot import Hankintatiedot as HankintatiedotModel
+from datetime import datetime
+
+def update_hankintatiedot_audit(db: Session, hankinta_id: int, current_user: User):
+    if not hankinta_id:
+        return
+    hankinta = db.query(HankintatiedotModel).filter(HankintatiedotModel.hankintaID == hankinta_id).first()
+    if hankinta:
+        now_str = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
+        hankinta.lisaysPVM = f"{now_str} {current_user.username}"
+        db.add(hankinta)
+
 @router.post("/", response_model=Schema, status_code=201)
 async def create_one(payload: SchemaCreate, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):
     invalidate_endpoint_cache("osastopaikka")
+    update_hankintatiedot_audit(db, payload.hankintaID, current_user)
     return await create_item(payload, db, Model)
 
 @router.put("/{osaston_numero}", response_model=Schema)
 async def update_one(osaston_numero: int, payload: SchemaCreate, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):
     invalidate_endpoint_cache("osastopaikka")
+    update_hankintatiedot_audit(db, payload.hankintaID, current_user)
     return await update_item(payload, db, Model, "osaston_numero", osaston_numero)
 
 @router.delete("/{osaston_numero}", status_code=204)
 async def delete_one(osaston_numero: int, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):
     invalidate_endpoint_cache("osastopaikka")
+    # Need to find the record first to get the hankintaID
+    record = db.query(Model).filter(Model.osaston_numero == osaston_numero).first()
+    if record and record.hankintaID:
+        update_hankintatiedot_audit(db, record.hankintaID, current_user)
     await delete_item(db, Model, "osaston_numero", osaston_numero)
 @router.get("/{osaston_numero}/sijoituspaikka", response_model=SijoituspaikkaPage)
 def read_sijoituspaikka_by_osaston_numero(osaston_numero: int, request: Request, page: int = Query(1, ge=1), page_size: int = Query(200, ge=1), db: Session = Depends(get_db)):
