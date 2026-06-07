@@ -10,8 +10,13 @@ class OsastopaikkaBase(BaseModel):
     kasvin_huomautuksia: Optional[str] = None
     hankintaID: Optional[int] = None
 
-class OsastopaikkaCreate(OsastopaikkaBase):
-    pass
+class OsastopaikkaCreate(BaseModel):
+    hankintaID: int
+    osaston_koodi: Optional[str] = None
+    osaston_nimi: Optional[str] = None
+    kasvin_status: Optional[str] = None
+    kasvin_huomautuksia: Optional[str] = None
+    osaston_numero: Optional[int] = None
 
 class Osastopaikka(OsastopaikkaBase):
     model_config = ConfigDict(from_attributes=True)
