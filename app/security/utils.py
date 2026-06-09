@@ -44,7 +44,10 @@ async def get_current_user(
 
 
 def verify_password(plain_password, hashed_password):
-    return password_hash.verify(plain_password, hashed_password)
+    try:
+        return password_hash.verify(plain_password, hashed_password)
+    except Exception:
+        return False
 
 
 def get_password_hash(password):
