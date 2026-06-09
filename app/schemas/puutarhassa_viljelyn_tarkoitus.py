@@ -5,8 +5,8 @@ from datetime import date, datetime
 class PuutarhassaViljelynTarkoitusBase(BaseModel):
     viljely_nro: int
     hankintaID: int
-    puutarhassa_viljelyn_tarkoitus: Optional[str]
-    puutarhassa_viljelyn_tarkenne: Optional[str]
+    puutarhassa_viljelyn_tarkoitus: Optional[str] = None
+    puutarhassa_viljelyn_tarkenne: Optional[str] = None
 
 class PuutarhassaViljelynTarkoitusCreate(BaseModel):
     hankintaID: int

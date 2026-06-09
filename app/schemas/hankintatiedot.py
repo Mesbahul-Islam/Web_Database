@@ -6,24 +6,24 @@ class HankintatiedotBase(BaseModel):
     hankintaID: int
     taksonin_nro: int
     lahettajanro: int
-    hankintanumero: Optional[str]
-    saapumispvm: Optional[str]
-    hankintanimi: Optional[str]
-    millaisena_saatu: Optional[str]
-    erikoiskokoelma_oma_puutarha: Optional[str]
-    materiaalin_arvo: Optional[str]
-    lisatiedot: Optional[str]
-    jarjestysnro: Optional[str]
-    vuosi: Optional[str]
-    lisaysPVM: Optional[str]
-    lisayshistoria: Optional[str]
-    kasvin_huomautuksia: Optional[str]
-    hankintahistoria: Optional[str]
-    put: Optional[int]
-    puttia: Optional[str]
-    numero: Optional[int]
-    vuosiluku: Optional[int]
-    heimo: Optional[str]
+    hankintanumero: Optional[str] = None
+    saapumispvm: Optional[str] = None
+    hankintanimi: Optional[str] = None
+    millaisena_saatu: Optional[str] = None
+    erikoiskokoelma_oma_puutarha: Optional[str] = None
+    materiaalin_arvo: Optional[str] = None
+    lisatiedot: Optional[str] = None
+    jarjestysnro: Optional[str] = None
+    vuosi: Optional[str] = None
+    lisaysPVM: Optional[str] = None
+    lisayshistoria: Optional[str] = None
+    kasvin_huomautuksia: Optional[str] = None
+    hankintahistoria: Optional[str] = None
+    put: Optional[int] = None
+    puttia: Optional[str] = None
+    numero: Optional[int] = None
+    vuosiluku: Optional[int] = None
+    heimo: Optional[str] = None
 
 class HankintatiedotCreate(HankintatiedotBase):
     pass
