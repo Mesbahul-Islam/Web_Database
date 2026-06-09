@@ -24,7 +24,7 @@ class AlkuperaaKoskevatTiedotBase(BaseModel):
     keraysretki: Optional[str] = None
 
 class AlkuperaaKoskevatTiedotCreate(AlkuperaaKoskevatTiedotBase):
-    pass
+    alkupera_nro: Optional[int] = None
 
 class AlkuperaaKoskevatTiedot(AlkuperaaKoskevatTiedotBase):
     model_config = ConfigDict(from_attributes=True)

@@ -26,7 +26,7 @@ class HankintatiedotBase(BaseModel):
     heimo: Optional[str] = None
 
 class HankintatiedotCreate(HankintatiedotBase):
-    pass
+    hankintaID: Optional[int] = None
 
 class Hankintatiedot(HankintatiedotBase):
     model_config = ConfigDict(from_attributes=True)

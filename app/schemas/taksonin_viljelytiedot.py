@@ -34,7 +34,7 @@ class TaksoninViljelytiedotBase(BaseModel):
     vapaa_viite: Optional[str] = None
 
 class TaksoninViljelytiedotCreate(TaksoninViljelytiedotBase):
-    pass
+    lisatietojen_nro_viljely: Optional[int] = None
 
 class TaksoninViljelytiedot(TaksoninViljelytiedotBase):
     model_config = ConfigDict(from_attributes=True)

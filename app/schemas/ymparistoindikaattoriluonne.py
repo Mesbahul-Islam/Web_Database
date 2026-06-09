@@ -10,7 +10,7 @@ class YmparistoindikaattoriluonneBase(BaseModel):
     viitenro: Optional[int] = None
 
 class YmparistoindikaattoriluonneCreate(YmparistoindikaattoriluonneBase):
-    pass
+    indikaattorin_nro: Optional[int] = None
 
 class Ymparistoindikaattoriluonne(YmparistoindikaattoriluonneBase):
     model_config = ConfigDict(from_attributes=True)

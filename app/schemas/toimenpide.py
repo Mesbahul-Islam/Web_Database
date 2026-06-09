@@ -10,7 +10,7 @@ class ToimenpideBase(BaseModel):
     uus_pvm: Optional[str] = None
 
 class ToimenpideCreate(ToimenpideBase):
-    pass
+    toimenpide_nro: Optional[int] = None
 
 class Toimenpide(ToimenpideBase):
     model_config = ConfigDict(from_attributes=True)

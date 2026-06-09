@@ -10,7 +10,7 @@ class KansainvalisetSopimuksetBase(BaseModel):
     viitenro: Optional[int] = None
 
 class KansainvalisetSopimuksetCreate(KansainvalisetSopimuksetBase):
-    pass
+    sopimus_id: Optional[int] = None
 
 class KansainvalisetSopimukset(KansainvalisetSopimuksetBase):
     model_config = ConfigDict(from_attributes=True)

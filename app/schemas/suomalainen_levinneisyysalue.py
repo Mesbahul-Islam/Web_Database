@@ -11,7 +11,7 @@ class SuomalainenLevinneisyysalueBase(BaseModel):
     viitenro: Optional[int] = None
 
 class SuomalainenLevinneisyysalueCreate(SuomalainenLevinneisyysalueBase):
-    pass
+    levinneisyysalueen_nro: Optional[int] = None
 
 class SuomalainenLevinneisyysalue(SuomalainenLevinneisyysalueBase):
     model_config = ConfigDict(from_attributes=True)

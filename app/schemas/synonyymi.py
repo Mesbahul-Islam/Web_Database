@@ -11,7 +11,7 @@ class SynonyymiBase(BaseModel):
     viite_2: Optional[int] = None
 
 class SynonyymiCreate(SynonyymiBase):
-    pass
+    synonyymin_nro: Optional[int] = None
 
 class Synonyymi(SynonyymiBase):
     model_config = ConfigDict(from_attributes=True)

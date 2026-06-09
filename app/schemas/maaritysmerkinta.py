@@ -16,7 +16,7 @@ class MaaritysmerkintaBase(BaseModel):
     uus_maarityspvm: Optional[date] = None
 
 class MaaritysmerkintaCreate(MaaritysmerkintaBase):
-    pass
+    maaritysnro: Optional[int] = None
 
 class Maaritysmerkinta(MaaritysmerkintaBase):
     model_config = ConfigDict(from_attributes=True)

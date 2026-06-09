@@ -14,7 +14,7 @@ class SijoituspaikkaBase(BaseModel):
     kasvin_huomautuksia: Optional[str] = None
 
 class SijoituspaikkaCreate(SijoituspaikkaBase):
-    pass
+    sijoituspaikan_nro: Optional[int] = None
 
 class Sijoituspaikka(SijoituspaikkaBase):
     model_config = ConfigDict(from_attributes=True)

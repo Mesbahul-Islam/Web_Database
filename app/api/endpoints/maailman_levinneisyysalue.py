@@ -1,13 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, Query
 from math import ceil
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Annotated
 
 from app.api.query import apply_filters, make_filter_dep
-from app.cache import cached_list
+from app.api.crud import create_item, update_item, delete_item
+from app.cache import cached_list, invalidate_endpoint_cache
 from app.database import get_db
-from app.models.maailman_levinneisyysalue import MaailmanLevinneisyysalue as Model  # maailman_levinneisyysalue: world_distribution_area
-from app.schemas.maailman_levinneisyysalue import MaailmanLevinneisyysalue as Schema, MaailmanLevinneisyysaluePage as SchemaPage  # maailman_levinneisyysalue: world_distribution_area
+from app.security.utils import get_current_user
+from app.models.user import User
+from app.models.maailman_levinneisyysalue import MaailmanLevinneisyysalue as Model
+from app.schemas.maailman_levinneisyysalue import MaailmanLevinneisyysalue as Schema, MaailmanLevinneisyysaluePage as SchemaPage, MaailmanLevinneisyysalueCreate as SchemaCreate
 
 router = APIRouter()
 
@@ -39,3 +42,18 @@ def read_one(taksonin_nro: str, db: Session = Depends(get_db)):  # taksonin_nro:
     if not item:
         raise HTTPException(status_code=404, detail="Not found")
     return item
+
+@router.post("/", response_model=Schema, status_code=201)
+async def create_one(payload: SchemaCreate, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):
+    invalidate_endpoint_cache("maailman_levinneisyysalue")
+    return await create_item(payload, db, Model)
+
+@router.put("/{id}", response_model=Schema)
+async def update_one(id: int, payload: SchemaCreate, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):
+    invalidate_endpoint_cache("maailman_levinneisyysalue")
+    return await update_item(payload, db, Model, "levinneisyysalueen_nro", id)
+
+@router.delete("/{id}", status_code=204)
+async def delete_one(id: int, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):
+    invalidate_endpoint_cache("maailman_levinneisyysalue")
+    await delete_item(db, Model, "levinneisyysalueen_nro", id)

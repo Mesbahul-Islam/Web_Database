@@ -16,7 +16,7 @@ class NaytetietojaBase(BaseModel):
     uus_naytteen_paivays: Optional[date] = None
 
 class NaytetietojaCreate(NaytetietojaBase):
-    pass
+    naytteen_nro: Optional[int] = None
 
 class Naytetietoja(NaytetietojaBase):
     model_config = ConfigDict(from_attributes=True)

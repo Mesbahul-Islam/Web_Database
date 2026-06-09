@@ -10,7 +10,7 @@ class AlkuperainenKasvupaikkaBase(BaseModel):
     viitenro: Optional[int] = None
 
 class AlkuperainenKasvupaikkaCreate(AlkuperainenKasvupaikkaBase):
-    pass
+    alkuperaisen_kasvupaikan_nro: Optional[int] = None
 
 class AlkuperainenKasvupaikka(AlkuperainenKasvupaikkaBase):
     model_config = ConfigDict(from_attributes=True)

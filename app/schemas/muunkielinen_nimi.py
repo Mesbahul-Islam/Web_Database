@@ -11,7 +11,7 @@ class MuunkielinenNimiBase(BaseModel):
     viite_2: Optional[int] = None
 
 class MuunkielinenNimiCreate(MuunkielinenNimiBase):
-    pass
+    nimen_nro: Optional[int] = None
 
 class MuunkielinenNimi(MuunkielinenNimiBase):
     model_config = ConfigDict(from_attributes=True)

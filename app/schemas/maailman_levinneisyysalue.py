@@ -12,7 +12,7 @@ class MaailmanLevinneisyysalueBase(BaseModel):
     lisatietoja: Optional[str] = None
 
 class MaailmanLevinneisyysalueCreate(MaailmanLevinneisyysalueBase):
-    pass
+    levinneisyysalueen_nro: Optional[int] = None
 
 class MaailmanLevinneisyysalue(MaailmanLevinneisyysalueBase):
     model_config = ConfigDict(from_attributes=True)

@@ -1,13 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, Query
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Annotated
 from math import ceil
 from app.api.query import apply_filters, make_filter_dep
-from app.cache import cached_list
+from app.api.crud import create_item, update_item, delete_item
+from app.cache import cached_list, invalidate_endpoint_cache
 from app.database import get_db
-from app.models.alkuperainen_kasvupaikka import AlkuperainenKasvupaikka as Model  # alkuperainen_kasvupaikka: original growing site
-from app.schemas.alkuperainen_kasvupaikka import AlkuperainenKasvupaikka as Schema  # alkuperainen_kasvupaikka: original growing site
-from app.schemas.alkuperainen_kasvupaikka import AlkuperainenKasvupaikkaPage as SchemaPage  # alkuperainen_kasvupaikka: original growing site
+from app.security.utils import get_current_user
+from app.models.user import User
+from app.models.alkuperainen_kasvupaikka import AlkuperainenKasvupaikka as Model
+from app.schemas.alkuperainen_kasvupaikka import AlkuperainenKasvupaikka as Schema, AlkuperainenKasvupaikkaCreate as SchemaCreate, AlkuperainenKasvupaikkaPage as SchemaPage
 router = APIRouter()
 
 @router.get("/", response_model=SchemaPage)
@@ -38,3 +40,18 @@ def read_one(taksonin_nro: str, db: Session = Depends(get_db)):  # taksonin_nro:
     if not item:
         raise HTTPException(status_code=404, detail="Not found")
     return item
+
+@router.post("/", response_model=Schema, status_code=201)
+async def create_one(payload: SchemaCreate, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):
+    invalidate_endpoint_cache("alkuperainen_kasvupaikka")
+    return await create_item(payload, db, Model)
+
+@router.put("/{id}", response_model=Schema)
+async def update_one(id: int, payload: SchemaCreate, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):
+    invalidate_endpoint_cache("alkuperainen_kasvupaikka")
+    return await update_item(payload, db, Model, "alkuperaisen_kasvupaikan_nro", id)
+
+@router.delete("/{id}", status_code=204)
+async def delete_one(id: int, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):
+    invalidate_endpoint_cache("alkuperainen_kasvupaikka")
+    await delete_item(db, Model, "alkuperaisen_kasvupaikan_nro", id)

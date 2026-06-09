@@ -10,7 +10,7 @@ class SuomalainenKasvupaikkaBase(BaseModel):
     viitenro: Optional[int] = None
 
 class SuomalainenKasvupaikkaCreate(SuomalainenKasvupaikkaBase):
-    pass
+    suomalaisen_kasvupaikan_nro: Optional[int] = None
 
 class SuomalainenKasvupaikka(SuomalainenKasvupaikkaBase):
     model_config = ConfigDict(from_attributes=True)

@@ -9,7 +9,7 @@ class SuunniteltuKasvupaikkaBase(BaseModel):
     sijoituspaikka: Optional[str] = None
 
 class SuunniteltuKasvupaikkaCreate(SuunniteltuKasvupaikkaBase):
-    pass
+    kasvupaikan_nro: Optional[int] = None
 
 class SuunniteltuKasvupaikka(SuunniteltuKasvupaikkaBase):
     model_config = ConfigDict(from_attributes=True)
