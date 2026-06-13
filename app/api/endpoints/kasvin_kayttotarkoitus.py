@@ -1,13 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, Query
 from math import ceil
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Annotated
 
 from app.api.query import apply_filters, make_filter_dep
 from app.cache import cached_list
+from app.api.crud import create_item, update_item, delete_item
 from app.database import get_db
-from app.models.kasvin_kayttotarkoitus import KasvinKayttotarkoitus as Model  # kasvin_kayttotarkoitus: plant_usage_purpose
-from app.schemas.kasvin_kayttotarkoitus import KasvinKayttotarkoitus as Schema, KasvinKayttotarkoitusPage as SchemaPage  # kasvin_kayttotarkoitus: plant_usage_purpose
+from app.security.utils import get_current_user
+from app.models.user import User
+from app.models.kasvin_kayttotarkoitus import KasvinKayttotarkoitus as Model
+from app.schemas.kasvin_kayttotarkoitus import KasvinKayttotarkoitus as Schema, KasvinKayttotarkoitusCreate as SchemaCreate, KasvinKayttotarkoitusPage as SchemaPage
 
 router = APIRouter()
 
@@ -33,9 +36,19 @@ def read_all(
         pages=pages,
     )
 
-@router.get("/{taksonin_nro}", response_model=Schema)  # taksonin_nro: taxon number
-def read_one(taksonin_nro: str, db: Session = Depends(get_db)):  # taksonin_nro: taxon number
-    item = db.query(Model).filter(Model.taksonin_nro == taksonin_nro).first()  # taksonin_nro: taxon number
-    if not item:
-        raise HTTPException(status_code=404, detail="Not found")
-    return item
+@router.get("/{taksonin_nro}", response_model=List[Schema])
+def read_one(taksonin_nro: str, db: Session = Depends(get_db)):
+    items = db.query(Model).filter(Model.taksonin_nro == taksonin_nro).all()
+    return items
+
+@router.post("/", response_model=Schema, status_code=201)
+async def create_one(payload: SchemaCreate, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):
+    return await create_item(payload, db, Model)
+
+@router.put("/{kayttonro}", response_model=Schema)
+async def update_one(kayttonro: int, payload: SchemaCreate, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):
+    return await update_item(payload, db, Model, "kayttonro", kayttonro)
+
+@router.delete("/{kayttonro}", status_code=204)
+async def delete_one(kayttonro: int, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):
+    await delete_item(db, Model, "kayttonro", kayttonro)
