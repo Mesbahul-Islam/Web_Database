@@ -14,3 +14,7 @@ class ListaTarkastajanimiPage(BaseModel):
     page: int
     page_size: int
     pages: int
+
+class ListaTarkastajanimiCreate(ListaTarkastajanimi):
+    pass
+

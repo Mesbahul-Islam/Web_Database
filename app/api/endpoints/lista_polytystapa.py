@@ -2,12 +2,13 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Query
 from math import ceil
 from sqlalchemy.orm import Session
 from typing import List
+from app.api.crud import create_item, update_item, delete_item
 
 from app.api.query import apply_filters, make_filter_dep
 from app.cache import cached_list
 from app.database import get_db
 from app.models.lista_polytystapa import ListaPolytystapa as Model  # lista_polytystapa: list pollination method
-from app.schemas.lista_polytystapa import ListaPolytystapa as Schema, ListaPolytystapaPage as SchemaPage  # lista_polytystapa: list pollination method
+from app.schemas.lista_polytystapa import ListaPolytystapa as Schema, ListaPolytystapaPage as SchemaPage, ListaPolytystapaCreate as SchemaCreate
 
 router = APIRouter()
 
@@ -39,3 +40,16 @@ def read_one(id: int, db: Session = Depends(get_db)):  # id: id
     if not item:
         raise HTTPException(status_code=404, detail="Not found")
     return item
+
+
+@router.post("/", response_model=Schema, status_code=201)
+async def create(payload: SchemaCreate, db: Session = Depends(get_db)):
+    return await create_item(payload, db, Model)
+
+@router.put("/{id}", response_model=Schema)
+async def update(id: int, payload: SchemaCreate, db: Session = Depends(get_db)):
+    return await update_item(payload, db, Model, "ID", id)
+
+@router.delete("/{id}", status_code=204)
+async def delete(id: int, db: Session = Depends(get_db)):
+    return await delete_item(db, Model, "ID", id)

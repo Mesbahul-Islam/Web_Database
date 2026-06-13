@@ -1,13 +1,15 @@
 from fastapi import APIRouter, Depends, Request, Query
 from math import ceil
+from typing import Optional
 from sqlalchemy.orm import Session
-from typing import List, Optional
+from typing import List
+from app.api.crud import create_item, update_item, delete_item
 
 from app.api.query import apply_filters, make_filter_dep
 from app.cache import cached_list
 from app.database import get_db
 from app.models.lista_tarkastajanimi import ListaTarkastajanimi as Model  # lista_tarkastajanimi: list_inspector_names
-from app.schemas.lista_tarkastajanimi import ListaTarkastajanimi as Schema, ListaTarkastajanimiPage as SchemaPage  # lista_tarkastajanimi: list_inspector_names
+from app.schemas.lista_tarkastajanimi import ListaTarkastajanimi as Schema, ListaTarkastajanimiPage as SchemaPage, ListaTarkastajanimiCreate as SchemaCreate
 
 router = APIRouter()
 
@@ -45,3 +47,16 @@ def read_by_key(
     if nimi is not None:
         query = query.filter(Model.nimi == nimi)
     return query.all()
+
+
+@router.post("/", response_model=Schema, status_code=201)
+async def create(payload: SchemaCreate, db: Session = Depends(get_db)):
+    return await create_item(payload, db, Model)
+
+@router.put("/{id}", response_model=Schema)
+async def update(id: int, payload: SchemaCreate, db: Session = Depends(get_db)):
+    return await update_item(payload, db, Model, "id", id)
+
+@router.delete("/{id}", status_code=204)
+async def delete(id: int, db: Session = Depends(get_db)):
+    return await delete_item(db, Model, "id", id)

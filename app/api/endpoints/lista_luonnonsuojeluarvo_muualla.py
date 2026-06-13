@@ -2,12 +2,13 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Query
 from math import ceil
 from sqlalchemy.orm import Session
 from typing import List
+from app.api.crud import create_item, update_item, delete_item
 
 from app.api.query import apply_filters, make_filter_dep
 from app.cache import cached_list
 from app.database import get_db
 from app.models.lista_luonnonsuojeluarvo_muualla import ListaLuonnonsuojeluarvoMuualla as Model  # lista_luonnonsuojeluarvo_muualla: list_nature_conservation_value_elsewhere
-from app.schemas.lista_luonnonsuojeluarvo_muualla import ListaLuonnonsuojeluarvoMuualla as Schema, ListaLuonnonsuojeluarvoMuuallaPage as SchemaPage  # lista_luonnonsuojeluarvo_muualla: list_nature_conservation_value_elsewhere
+from app.schemas.lista_luonnonsuojeluarvo_muualla import ListaLuonnonsuojeluarvoMuualla as Schema, ListaLuonnonsuojeluarvoMuuallaPage as SchemaPage, ListaLuonnonsuojeluarvoMuuallaCreate as SchemaCreate
 
 router = APIRouter()
 
@@ -39,3 +40,16 @@ def read_one(id: int, db: Session = Depends(get_db)):  # id: id
     if not item:
         raise HTTPException(status_code=404, detail="Not found")
     return item
+
+
+@router.post("/", response_model=Schema, status_code=201)
+async def create(payload: SchemaCreate, db: Session = Depends(get_db)):
+    return await create_item(payload, db, Model)
+
+@router.put("/{id}", response_model=Schema)
+async def update(id: int, payload: SchemaCreate, db: Session = Depends(get_db)):
+    return await update_item(payload, db, Model, "ID", id)
+
+@router.delete("/{id}", status_code=204)
+async def delete(id: int, db: Session = Depends(get_db)):
+    return await delete_item(db, Model, "ID", id)
