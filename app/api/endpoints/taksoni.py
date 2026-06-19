@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, Query
 from math import ceil
 from sqlalchemy.orm import Session
-from typing import List, Annotated
+from typing import List, Annotated, Optional
+from sqlalchemy import func, String, cast
 
 from app.api.query import apply_filters, make_filter_dep
 from app.api.crud import create_item, update_item, delete_item
@@ -14,6 +15,7 @@ from app.schemas.taksoni import (
     Taksoni as Schema,
     TaksoniCreate as SchemaCreate,
     TaksoniPage as SchemaPage,
+    TaksoninHankintatiedotYhteenvetoPage
 )  # taksoni: taxon
 
 from app.models.alkuperainen_kasvupaikka import AlkuperainenKasvupaikka as AlkuperainenKasvupaikkaModel
@@ -63,6 +65,72 @@ def read_all(
     pages = ceil(total / page_size) if total else 0
     return {
         "items": items,
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "pages": pages,
+    }
+
+@router.get("/hankintatiedot_yhteenveto", response_model=TaksoninHankintatiedotYhteenvetoPage)
+def read_hankintatiedot_yhteenveto(
+    request: Request,
+    page: int = Query(1, ge=1),
+    page_size: int = Query(25, ge=1),
+    search: Optional[str] = None,
+    sort_by: str = Query("default"),
+    db: Session = Depends(get_db),
+):
+    subq = db.query(
+        Model.taksonin_nro.label("taksonin_nro"),
+        Model.tieteellinen_nimi.label("tieteellinen_nimi"),
+        Model.suku.label("suku"),
+        Model.laji.label("laji"),
+        func.coalesce(func.group_concat(HankintatiedotModel.hankintanumero, ", "), "").label("hankintanumerot"),
+        func.count(HankintatiedotModel.hankintaID).label("hankinnat_lkm")
+    ).outerjoin(
+        HankintatiedotModel, Model.taksonin_nro == HankintatiedotModel.taksonin_nro
+    ).group_by(
+        Model.taksonin_nro
+    ).subquery()
+    
+    query = db.query(subq)
+    
+    if search:
+        s = f"%{search.lower()}%"
+        query = query.filter(
+            func.lower(subq.c.tieteellinen_nimi).like(s) |
+            func.lower(subq.c.suku).like(s) |
+            func.lower(subq.c.laji).like(s) |
+            cast(subq.c.taksonin_nro, String).like(s) |
+            func.lower(subq.c.hankintanumerot).like(s)
+        )
+    
+    if sort_by == "acquisitions-desc":
+        query = query.order_by(subq.c.hankinnat_lkm.desc(), subq.c.taksonin_nro.asc())
+    elif sort_by == "acquisitions-asc":
+        query = query.order_by(subq.c.hankinnat_lkm.asc(), subq.c.taksonin_nro.asc())
+    else:
+        query = query.order_by(subq.c.taksonin_nro.asc())
+        
+    total = query.count()
+    offset = (page - 1) * page_size
+    items = query.offset(offset).limit(page_size).all()
+    pages = ceil(total / page_size) if total else 0
+    
+    res_items = []
+    for item in items:
+        res_items.append({
+            "taksonin_nro": item.taksonin_nro,
+            "tieteellinen_nimi": item.tieteellinen_nimi,
+            "suku": item.suku,
+            "laji": item.laji,
+            "hankintanumerot": item.hankintanumerot,
+            "hankinnat_lkm": item.hankinnat_lkm,
+            "searchId": str(item.taksonin_nro)
+        })
+
+    return {
+        "items": res_items,
         "total": total,
         "page": page,
         "page_size": page_size,

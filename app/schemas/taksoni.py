@@ -50,3 +50,21 @@ class TaksoniPage(BaseModel):
     page: int
     page_size: int
     pages: int
+
+
+class TaksoninHankintatiedotYhteenveto(BaseModel):
+    taksonin_nro: int
+    tieteellinen_nimi: Optional[str] = None
+    suku: Optional[str] = None
+    laji: Optional[str] = None
+    hankintanumerot: str
+    hankinnat_lkm: int
+    searchId: str
+
+class TaksoninHankintatiedotYhteenvetoPage(BaseModel):
+    items: List[TaksoninHankintatiedotYhteenveto]
+    total: int
+    page: int
+    page_size: int
+    pages: int
+
