@@ -18,11 +18,14 @@ Provides full access to a botanical garden's plant records:
 
 ### 1. Set Up Virtual Environment
 
+This project uses `uv` for lightning-fast package management, but standard `pip` works too.
+
 ```bash
-python3 -m venv .venv
+uv venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 ```
+*(If you don't have `uv` installed, simply use `python3 -m venv .venv` and `pip install -r requirements.txt`)*
 
 ### 2. Configure Environment Variables
 
@@ -30,59 +33,30 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-Edit `.env` with your database and authentication settings. The app uses `DATABASE_URL` directly, so set it to a SQLAlchemy-compatible connection string for the database you want to use.
+Edit `.env` with your database and authentication settings. The app uses `pydantic-settings` to strictly validate these variables on startup.
 
-### 3. Load the PostgreSQL Dump
+**Required Variables in `.env`:**
+- `DATABASE_URL`: The SQLAlchemy connection string (e.g., `sqlite:///./puutarhakanta.sqlite` or `postgresql+psycopg2://user:pass@host:5432/postgres?sslmode=require`)
+- `SECRET_KEY`: A secure random string for JWT token generation.
+- `ALGORITHM`: (Optional) Defaults to `HS256`.
+- `ACCESS_TOKEN_EXPIRE_MINUTES`: (Optional) Defaults to 15.
 
-**Option A: Use Local SQLite (Default & Recommended)**
+### 3. Initialize the Database (Alembic)
 
-SQLite is the default database with no separate server required:
+This project uses **Alembic** to manage database schemas cleanly across both SQLite and PostgreSQL. You do not need to manually import SQL dumps.
 
-```bash
-mkdir -p ./sqlite-backup
-sqlite3 ./sqlite-backup/puutarhakanta2005.sqlite < puutarhakanta2005_schema.sql
-```
-
-Verify the tables were created:
-
-```bash
-sqlite3 ./sqlite-backup/puutarhakanta2005.sqlite ".tables"
-```
-
-The app will automatically use `./sqlite-backup/puutarhakanta2005.sqlite` when you run it.
-
-**Option B: Use Docker MySQL**
+To create all tables and apply schemas automatically, run:
 
 ```bash
-mkdir -p ./db-backups
-cp puutarhakanta2005_schema.sql ./db-backups/
-docker compose up -d mysql
+alembic upgrade head
 ```
 
-Then configure `.env`:
-```
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_NAME=puutarhakanta2005
-DB_USER=tarkastususer
-DB_PASSWORD=tarkastususer
-```
-
-**Option C: Use External MySQL**
-
-Configure `.env` with your server details:
-```
-DB_HOST=your-mysql-host
-DB_PORT=3306
-DB_NAME=puutarhakanta2005
-DB_USER=your_user
-DB_PASSWORD=your_password
-```
+*Note: The Alembic environment is dynamically configured to handle SQLite (using batch operations) and PostgreSQL (using native constraints) seamlessly.*
 
 ### 4. Run the Application
 
 ```bash
-fastapi dev
+fastapi dev app/main.py
 ```
 
 API will be available at `http://localhost:8000`
@@ -93,25 +67,14 @@ API will be available at `http://localhost:8000`
 
 ## Environment Variables
 
-### Database Connection
-
-**For SQLite (Default):**
-- No database variables needed. The app automatically uses `./sqlite-backup/puutarhakanta2005.sqlite`
-
-**For MySQL:**
-Set these variables in `.env`:
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `DATABASE_URL` | _(required)_ | Full SQLAlchemy URL for the database connection (for example, `postgresql+psycopg2://user:pass@host:5432/postgres?sslmode=require`) |
-
-### Authentication
+### Configuration (`.env`)
 
 | Variable | Default | Description |
 |----------|---------|----------|
-| `JWT_SECRET_KEY` | _(required for auth)_ | Secret key for signing JWT tokens (min 32 characters) |
-| `JWT_ALGORITHM` | `HS256` | JWT signing algorithm |
-| `JWT_EXPIRATION_HOURS` | `24` | JWT token expiration time in hours |
+| `DATABASE_URL` | `sqlite:///./puutarhakanta2005.sqlite` | Full SQLAlchemy URL for the database connection |
+| `SECRET_KEY` | _(required)_ | Secret key for signing JWT tokens (min 32 characters) |
+| `ALGORITHM` | `HS256` | JWT signing algorithm |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | `15` | JWT token expiration time in minutes |
 
 Generate a secure secret key:
 ```bash

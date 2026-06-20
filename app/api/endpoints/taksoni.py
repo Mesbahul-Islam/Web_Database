@@ -18,6 +18,26 @@ from app.schemas.taksoni import (
     TaksoninHankintatiedotYhteenvetoPage
 )  # taksoni: taxon
 
+from sqlalchemy.sql.expression import FunctionElement
+from sqlalchemy.ext.compiler import compiles
+
+class group_concat(FunctionElement):
+    name = 'group_concat'
+    inherit_cache = True
+
+@compiles(group_concat)
+def compile_group_concat(element, compiler, **kw):
+    return "group_concat(%s)" % compiler.process(element.clauses, **kw)
+
+@compiles(group_concat, 'postgresql')
+def compile_group_concat_pg(element, compiler, **kw):
+    if len(element.clauses) == 2:
+        return "string_agg(%s, %s)" % (
+            compiler.process(element.clauses.clauses[0], **kw),
+            compiler.process(element.clauses.clauses[1], **kw)
+        )
+    return "string_agg(%s, ',')" % compiler.process(element.clauses.clauses[0], **kw)
+
 from app.models.alkuperainen_kasvupaikka import AlkuperainenKasvupaikka as AlkuperainenKasvupaikkaModel
 from app.schemas.alkuperainen_kasvupaikka import AlkuperainenKasvupaikkaPage as AlkuperainenKasvupaikkaPage
 from app.models.hankintatiedot import Hankintatiedot as HankintatiedotModel
@@ -90,7 +110,7 @@ def read_hankintatiedot_yhteenveto(
         Model.tieteellinen_nimi.label("tieteellinen_nimi"),
         Model.suku.label("suku"),
         Model.laji.label("laji"),
-        func.coalesce(func.group_concat(HankintatiedotModel.hankintanumero, ", "), "").label("hankintanumerot"),
+        func.coalesce(group_concat(HankintatiedotModel.hankintanumero, ", "), "").label("hankintanumerot"),
         func.count(HankintatiedotModel.hankintaID).label("hankinnat_lkm")
     ).outerjoin(
         HankintatiedotModel, Model.taksonin_nro == HankintatiedotModel.taksonin_nro
