@@ -13,6 +13,8 @@ class AlkuperainenKasvupaikkaCreate(AlkuperainenKasvupaikkaBase):
     alkuperaisen_kasvupaikan_nro: Optional[int] = None
 
 class AlkuperainenKasvupaikka(AlkuperainenKasvupaikkaBase):
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
     model_config = ConfigDict(from_attributes=True)
 
 class AlkuperainenKasvupaikkaPage(BaseModel):

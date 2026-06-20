@@ -19,6 +19,8 @@ class NaytetietojaCreate(NaytetietojaBase):
     naytteen_nro: Optional[int] = None
 
 class Naytetietoja(NaytetietojaBase):
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
     model_config = ConfigDict(from_attributes=True)
 
 class NaytetietojaPage(BaseModel):

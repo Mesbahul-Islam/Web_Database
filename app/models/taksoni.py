@@ -1,12 +1,14 @@
-from .base import Base
+from .base import Base, TimestampMixin
 from typing import Optional
 import datetime
+from sqlalchemy import DateTime
+from sqlalchemy.sql import func
 from sqlalchemy import Column, Date, ForeignKeyConstraint, Index, String, Table, Text, text
 from sqlalchemy import Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
-class Taksoni(Base):
+class Taksoni(Base, TimestampMixin):
     # Taxon
     __tablename__ = 'taksoni'
     __searchable_columns__ = ('tieteellinen_nimi', 'suku', 'laji')

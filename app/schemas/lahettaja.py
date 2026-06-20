@@ -27,4 +27,6 @@ class LahettajaCreate(LahettajaBase):
     pass
 
 class Lahettaja(LahettajaBase):
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
     model_config = ConfigDict(from_attributes=True)

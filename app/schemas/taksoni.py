@@ -42,6 +42,8 @@ class TaksoniCreate(TaksoniBase):
     taksonin_nro: Optional[int] = None
 
 class Taksoni(TaksoniBase):
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
     model_config = ConfigDict(from_attributes=True)
 
 class TaksoniPage(BaseModel):

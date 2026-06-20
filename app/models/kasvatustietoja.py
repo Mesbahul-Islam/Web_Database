@@ -1,12 +1,14 @@
-from .base import Base
+from .base import Base, TimestampMixin
 from typing import Optional
 import datetime
+from sqlalchemy import DateTime
+from sqlalchemy.sql import func
 from sqlalchemy import Column, Date, ForeignKeyConstraint, Index, String, Table, Text, text
 from sqlalchemy import Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
-class Kasvatustietoja(Base):
+class Kasvatustietoja(Base, TimestampMixin):
     # Cultivation records
     __tablename__ = 'kasvatustietoja'
     __table_args__ = (ForeignKeyConstraint(['hankintaID'], ['hankintatiedot.hankintaID'], name='kasvatustietoja_ibfk_1'), Index('IDX_Kasvatustietoja1', 'hankintaID'))

@@ -1,4 +1,4 @@
-from .base import Base
+from .base import Base, TimestampMixin
 from typing import Optional
 import datetime
 from sqlalchemy import Column, Date, ForeignKeyConstraint, Index, String, Table, Text, text
@@ -6,7 +6,7 @@ from sqlalchemy import Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
-class AlkuperainenKasvupaikka(Base):
+class AlkuperainenKasvupaikka(Base, TimestampMixin):
     # Original growing site
     __tablename__ = 'alkuperainen_kasvupaikka'
     __table_args__ = (ForeignKeyConstraint(['taksonin_nro'], ['taksoni.taksonin_nro'], name='alkuperainen_kasvupaikka_ibfk_1'), ForeignKeyConstraint(['viitenro'], ['viite.viitenro'], name='alkuperainen_kasvupaikka_ibfk_2'), Index('IDX_Alkuperainen_kasvupaikka1', 'taksonin_nro'), Index('IDX_Alkuperainen_kasvupaikka2', 'viitenro'))

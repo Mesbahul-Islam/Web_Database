@@ -29,6 +29,8 @@ class HankintatiedotCreate(HankintatiedotBase):
     hankintaID: Optional[int] = None
 
 class Hankintatiedot(HankintatiedotBase):
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
     model_config = ConfigDict(from_attributes=True)
 
 class HankintatiedotPage(BaseModel):

@@ -1,15 +1,17 @@
-from .base import Base
+from .base import Base, TimestampMixin
 from typing import Optional
 import datetime
+from sqlalchemy import DateTime
+from sqlalchemy.sql import func
 from sqlalchemy import Column, Date, ForeignKeyConstraint, Index, String, Table, Text, text
 from sqlalchemy import Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
-class Hankintatiedot(Base):
+class Hankintatiedot(Base, TimestampMixin):
     # Acquisition data
     __tablename__ = 'hankintatiedot'
-    __table_args__ = (ForeignKeyConstraint(['lahettajanro'], ['lahettaja.lahettajanro'], name='hankintatiedot_ibfk_2'), ForeignKeyConstraint(['taksonin_nro'], ['taksoni.taksonin_nro'], name='hankintatiedot_ibfk_1'), Index('IDX_Hankintatiedot1', 'taksonin_nro'), Index('IDX_Hankintatiedot2', 'lahettajanro'), Index('hankintanumero', 'hankintanumero', unique=True))
+    __table_args__ = (ForeignKeyConstraint(['lahettajanro'], ['lahettaja.lahettajanro'], name='hankintatiedot_ibfk_2'), ForeignKeyConstraint(['taksonin_nro'], ['taksoni.taksonin_nro'], name='hankintatiedot_ibfk_1'), Index('IDX_Hankintatiedot1', 'taksonin_nro'), Index('IDX_Hankintatiedot2', 'lahettajanro'), Index('ix_hankintatiedot_hankintanumero', 'hankintanumero', unique=True))
     # Acquisition ID
     hankintaID: Mapped[int] = mapped_column(Integer, primary_key=True)
     # Taxon number
@@ -17,7 +19,7 @@ class Hankintatiedot(Base):
     # Sender number
     lahettajanro: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0'))
     # Acquisition number
-    hankintanumero: Mapped[Optional[str]] = mapped_column(String(255))
+    hankintanumero: Mapped[Optional[str]] = mapped_column(String(255), unique=True)
     # Arrival date
     saapumispvm: Mapped[Optional[str]] = mapped_column(String(255))
     # Acquisition name

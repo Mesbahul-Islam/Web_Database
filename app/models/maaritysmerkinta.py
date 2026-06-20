@@ -1,12 +1,14 @@
-from .base import Base
+from .base import Base, TimestampMixin, SafeDate
 from typing import Optional
 import datetime
-from sqlalchemy import Column, Date, ForeignKeyConstraint, Index, String, Table, Text, text
+from sqlalchemy import DateTime
+from sqlalchemy.sql import func
+from sqlalchemy import Column, ForeignKeyConstraint, Index, String, Table, Text, text
 from sqlalchemy import Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
-class Maaritysmerkinta(Base):
+class Maaritysmerkinta(Base, TimestampMixin):
     # Identification mark record
     __tablename__ = 'maaritysmerkinta'
     __table_args__ = (ForeignKeyConstraint(['hankintaID'], ['hankintatiedot.hankintaID'], name='maaritysmerkinta_ibfk_1'), Index('IDX_Maaritysmerkinta1', 'hankintaID'))
@@ -31,6 +33,7 @@ class Maaritysmerkinta(Base):
     # New taxon
     uusitaksoni: Mapped[Optional[str]] = mapped_column(String(255))
     # New identification date
-    uus_maarityspvm: Mapped[Optional[datetime.date]] = mapped_column(Date)
+    uus_maarityspvm: Mapped[Optional[datetime.date]] = mapped_column(SafeDate)
     # Acquisition data
     hankintatiedot: Mapped[Optional['Hankintatiedot']] = relationship('Hankintatiedot', back_populates='maaritysmerkinta')
+

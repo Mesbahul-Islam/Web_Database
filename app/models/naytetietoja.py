@@ -1,12 +1,14 @@
-from .base import Base
+from .base import Base, TimestampMixin, SafeDate
 from typing import Optional
 import datetime
-from sqlalchemy import Column, Date, ForeignKeyConstraint, Index, String, Table, Text, text
+from sqlalchemy import DateTime
+from sqlalchemy.sql import func
+from sqlalchemy import Column, ForeignKeyConstraint, Index, String, Table, Text, text
 from sqlalchemy import Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
-class Naytetietoja(Base):
+class Naytetietoja(Base, TimestampMixin):
     # Specimen information
     __tablename__ = 'naytetietoja'
     __table_args__ = (ForeignKeyConstraint(['hankintaID'], ['hankintatiedot.hankintaID'], name='naytetietoja_ibfk_1'), Index('IDX_Naytetietoja1', 'hankintaID'))
@@ -31,6 +33,7 @@ class Naytetietoja(Base):
     # Reference explanation
     viitteen_selite: Mapped[Optional[str]] = mapped_column(String(255))
     # New specimen date
-    uus_naytteen_paivays: Mapped[Optional[datetime.date]] = mapped_column(Date)
+    uus_naytteen_paivays: Mapped[Optional[datetime.date]] = mapped_column(SafeDate)
     # Acquisition data
     hankintatiedot: Mapped[Optional['Hankintatiedot']] = relationship('Hankintatiedot', back_populates='naytetietoja')
+

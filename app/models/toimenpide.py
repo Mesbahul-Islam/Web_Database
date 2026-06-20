@@ -1,12 +1,14 @@
-from .base import Base
+from .base import Base, TimestampMixin
 from typing import Optional
 import datetime
+from sqlalchemy import DateTime
+from sqlalchemy.sql import func
 from sqlalchemy import Column, Date, ForeignKeyConstraint, Index, String, Table, Text, text
 from sqlalchemy import Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
-class Toimenpide(Base):
+class Toimenpide(Base, TimestampMixin):
     # Action
     __tablename__ = 'toimenpide'
     __table_args__ = (ForeignKeyConstraint(['hankintaID'], ['hankintatiedot.hankintaID'], name='toimenpide_ibfk_1'), Index('IDX_Toimenpide1', 'hankintaID'))

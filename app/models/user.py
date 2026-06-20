@@ -1,5 +1,5 @@
 import enum
-from .base import Base
+from .base import Base, TimestampMixin
 from typing import Annotated, Optional
 from sqlalchemy.orm import mapped_column, Mapped
 from sqlalchemy import Enum as SQLEnum, String, Integer
@@ -11,7 +11,7 @@ class RoleEnum(str, enum.Enum):
     STAFF = "staff"
 
 
-class User(Base):
+class User(Base, TimestampMixin):
     __tablename__ = 'users'
     # User ID
     id: Mapped[Optional[int]] = mapped_column(Integer, primary_key=True, autoincrement=True)

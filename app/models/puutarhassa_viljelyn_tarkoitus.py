@@ -1,12 +1,14 @@
-from .base import Base
+from .base import Base, TimestampMixin
 from typing import Optional
 import datetime
+from sqlalchemy import DateTime
+from sqlalchemy.sql import func
 from sqlalchemy import Column, Date, ForeignKeyConstraint, Index, String, Table, Text, text
 from sqlalchemy import Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
-class PuutarhassaViljelynTarkoitus(Base):
+class PuutarhassaViljelynTarkoitus(Base, TimestampMixin):
     # Garden cultivation purpose
     __tablename__ = 'puutarhassa_viljelyn_tarkoitus'
     __table_args__ = (ForeignKeyConstraint(['hankintaID'], ['hankintatiedot.hankintaID'], name='puutarhassa_viljelyn_tarkoitus_ibfk_1'), Index('IDX_Puutarhassa_viljelyn_tarkoitus1', 'hankintaID'))

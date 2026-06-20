@@ -19,6 +19,8 @@ class MaaritysmerkintaCreate(MaaritysmerkintaBase):
     maaritysnro: Optional[int] = None
 
 class Maaritysmerkinta(MaaritysmerkintaBase):
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
     model_config = ConfigDict(from_attributes=True)
 
 class MaaritysmerkintaPage(BaseModel):

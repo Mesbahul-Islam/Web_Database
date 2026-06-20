@@ -16,6 +16,8 @@ class KasvatustietojaCreate(KasvatustietojaBase):
     pass
 
 class Kasvatustietoja(KasvatustietojaBase):
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
     model_config = ConfigDict(from_attributes=True)
 
 class KasvatustietojaPage(BaseModel):

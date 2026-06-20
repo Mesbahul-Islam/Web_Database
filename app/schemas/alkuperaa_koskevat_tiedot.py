@@ -27,6 +27,8 @@ class AlkuperaaKoskevatTiedotCreate(AlkuperaaKoskevatTiedotBase):
     alkupera_nro: Optional[int] = None
 
 class AlkuperaaKoskevatTiedot(AlkuperaaKoskevatTiedotBase):
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
     model_config = ConfigDict(from_attributes=True)
 
 class AlkuperaaKoskevatTiedotPage(BaseModel):

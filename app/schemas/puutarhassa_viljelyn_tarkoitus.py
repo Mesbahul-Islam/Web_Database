@@ -16,6 +16,8 @@ class PuutarhassaViljelynTarkoitusCreate(BaseModel):
 
 
 class PuutarhassaViljelynTarkoitus(PuutarhassaViljelynTarkoitusBase):
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
     model_config = ConfigDict(from_attributes=True)
 
 class PuutarhassaViljelynTarkoitusPage(BaseModel):

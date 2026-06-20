@@ -19,6 +19,8 @@ class OsastopaikkaCreate(BaseModel):
     osaston_numero: Optional[int] = None
 
 class Osastopaikka(OsastopaikkaBase):
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
     model_config = ConfigDict(from_attributes=True)
 
 class OsastopaikkaPage(BaseModel):
