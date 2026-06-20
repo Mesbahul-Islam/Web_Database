@@ -1,29 +1,28 @@
 import os
 from pathlib import Path
+from typing import Optional
 
 from dotenv import load_dotenv
 
 
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
 _PROJECT_ROOT = Path(__file__).resolve().parents[2]
-_APP_ENV_FILE = _PROJECT_ROOT / "app" / ".env"
-_ROOT_ENV_FILE = _PROJECT_ROOT / ".env"
 
-if _ROOT_ENV_FILE.exists():
-    load_dotenv(_ROOT_ENV_FILE)
+class Settings(BaseSettings):
+    SECRET_KEY: str
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
+    DATABASE_URL: Optional[str] = None
 
-if _APP_ENV_FILE.exists():
-    load_dotenv(_APP_ENV_FILE)
+    model_config = SettingsConfigDict(
+        env_file=(".env", "app/.env"), 
+        env_file_encoding="utf-8", 
+        extra="ignore"
+    )
 
-DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = int(os.getenv("DB_PORT", "3306"))
-DB_NAME = os.getenv("DB_NAME", "puutarhakanta2005")
-DB_USER = os.getenv("DB_USER", "tarkastususer")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "tarkastususer")
-SECRET_KEY=os.getenv("SECRET_KEY")
-ALGORITHM=os.getenv("ALGORITHM", "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "15"))
-
-
-DATABASE_URL = os.getenv("DATABASE_URL") or (
-    f"sqlite:///{_PROJECT_ROOT / 'sqlite-backup' / 'puutarhakanta2005.sqlite'}"
-)
+settings = Settings()
+SECRET_KEY = settings.SECRET_KEY
+ALGORITHM = settings.ALGORITHM
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
+DATABASE_URL = settings.DATABASE_URL if settings.DATABASE_URL else f"sqlite:///{_PROJECT_ROOT / 'sqlite-backup' / 'puutarhakanta2005.sqlite'}"

@@ -9,12 +9,15 @@ from app.schemas.user import User as UserSchema, UserCreate
 from app.security.utils import get_current_user, get_user, authenticate_user, get_password_hash
 from app.security.token import create_access_token
 from datetime import timedelta
-from app.core.config import ACCESS_TOKEN_EXPIRE_MINUTES
+from app.core.config import settings
+from app.core.limiter import limiter
 
 router = APIRouter()
 
 @router.post("/token")
+@limiter.limit("5/minute")
 async def login_for_access_token(
+    request: Request,
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: Session = Depends(get_db)
 ):
@@ -25,7 +28,7 @@ async def login_for_access_token(
             detail="Invalid authentication credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )

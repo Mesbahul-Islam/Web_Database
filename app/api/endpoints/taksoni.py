@@ -46,11 +46,16 @@ from app.models.taksonin_viljelytiedot import TaksoninViljelytiedot as TaksoninV
 from app.schemas.taksonin_viljelytiedot import TaksoninViljelytiedotPage as TaksoninViljelytiedotPage
 from app.models.ymparistoindikaattoriluonne import Ymparistoindikaattoriluonne as YmparistoindikaattoriluonneModel
 from app.schemas.ymparistoindikaattoriluonne import YmparistoindikaattoriluonnePage as YmparistoindikaattoriluonnePage
+from app.core.config import settings
+from app.core.limiter import limiter
+
+
 router = APIRouter()
 
 @router.get("", response_model=SchemaPage, include_in_schema=False)
 @router.get("/", response_model=SchemaPage)
 @cached_list("taksoni")
+@limiter.limit("20/minute")
 def read_all(
     request: Request,
     page: int = Query(1, ge=1),

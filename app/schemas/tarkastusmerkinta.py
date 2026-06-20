@@ -2,7 +2,6 @@ from pydantic import BaseModel, ConfigDict
 from typing import List, Optional
 
 class TarkastusmerkintaBase(BaseModel):
-    tarkastusnro: int
     tarkastuspvm: Optional[str] = None
     elavia_yksiloita: Optional[str] = None
     menestymista_koskevat_havainnot: Optional[str] = None
