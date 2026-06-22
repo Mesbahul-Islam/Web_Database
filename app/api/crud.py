@@ -45,10 +45,16 @@ async def update_item(payload: Any, db: Session, model: Any, pk_field: str, pk_v
     return item
 
 
+import datetime
+
 async def delete_item(db: Session, model: Any, pk_field: str, pk_value: Any):
     item = db.query(model).filter(getattr(model, pk_field) == pk_value).first()
     if not item:
         raise HTTPException(status_code=404, detail="Not found")
 
-    db.delete(item)
+    if hasattr(item, "deleted_at"):
+        item.deleted_at = datetime.datetime.now(datetime.timezone.utc)
+    else:
+        db.delete(item)
+        
     db.commit()

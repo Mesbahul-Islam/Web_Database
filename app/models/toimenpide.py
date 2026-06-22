@@ -22,5 +22,7 @@ class Toimenpide(Base, TimestampMixin):
     hankintaID: Mapped[Optional[int]] = mapped_column(Integer)
     # New date (stored as string to handle malformed dates in database)
     uus_pvm: Mapped[Optional[str]] = mapped_column(String(255))
+    # Deleted At (for soft delete / undo)
+    deleted_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime, default=None, nullable=True)
     # Acquisition data
     hankintatiedot: Mapped[Optional['Hankintatiedot']] = relationship('Hankintatiedot', back_populates='toimenpide')

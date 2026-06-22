@@ -1,7 +1,7 @@
 from .base import Base
 from typing import Optional
 import datetime
-from sqlalchemy import Column, Date, ForeignKeyConstraint, Index, String, Table, Text, text
+from sqlalchemy import Column, Date, ForeignKeyConstraint, Index, String, Table, Text, text, DateTime
 from sqlalchemy import Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
@@ -26,5 +26,7 @@ class Tarkastusmerkinta(Base):
     sijoituspaikan_nro: Mapped[Optional[int]] = mapped_column(Integer)
     # New inspection date (stored as string to handle malformed dates in database)
     uus_tarkastuspvm: Mapped[Optional[str]] = mapped_column(String(255))
+    # Deleted At (for soft delete / undo)
+    deleted_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime, default=None, nullable=True)
     # Placement location
     sijoituspaikka: Mapped[Optional['Sijoituspaikka']] = relationship('Sijoituspaikka', back_populates='tarkastusmerkinta')
