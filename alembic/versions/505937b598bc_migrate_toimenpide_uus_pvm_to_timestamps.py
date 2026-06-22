@@ -35,7 +35,8 @@ def upgrade() -> None:
 
     query = toimenpide.select().where(toimenpide.c.uus_pvm.isnot(None))
     results = bind.execute(query).fetchall()
-
+    
+    updates = []
     for row in results:
         mapping = row._mapping
         raw_date = str(mapping["uus_pvm"]).strip()
@@ -53,12 +54,21 @@ def upgrade() -> None:
                     pass
                     
         if parsed_date:
-            update_stmt = (
-                toimenpide.update()
-                .where(toimenpide.c.toimenpide_nro == mapping["toimenpide_nro"])
-                .values(created_at=parsed_date, updated_at=parsed_date)
-            )
-            bind.execute(update_stmt)
+            updates.append({
+                "b_toimenpide_nro": mapping["toimenpide_nro"],
+                "b_created_at": parsed_date,
+                "b_updated_at": parsed_date
+            })
+            
+    if updates:
+        # Use bulk update to avoid 31k network roundtrips
+        update_stmt = (
+            toimenpide.update()
+            .where(toimenpide.c.toimenpide_nro == sa.bindparam("b_toimenpide_nro"))
+            .values(created_at=sa.bindparam("b_created_at"), updated_at=sa.bindparam("b_updated_at"))
+        )
+        # Execute all updates in a single executemany call
+        bind.execute(update_stmt, updates)
 
 
 def downgrade() -> None:
