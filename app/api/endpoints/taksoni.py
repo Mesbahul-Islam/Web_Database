@@ -75,7 +75,6 @@ router = APIRouter()
 @router.get("", response_model=SchemaPage, include_in_schema=False)
 @router.get("/", response_model=SchemaPage)
 @cached_list("taksoni")
-@limiter.limit("20/minute")
 def read_all(
     request: Request,
     page: int = Query(1, ge=1),
@@ -115,7 +114,10 @@ def read_hankintatiedot_yhteenveto(
     ).outerjoin(
         HankintatiedotModel, Model.taksonin_nro == HankintatiedotModel.taksonin_nro
     ).group_by(
-        Model.taksonin_nro
+        Model.taksonin_nro,
+        Model.tieteellinen_nimi,
+        Model.suku,
+        Model.laji
     ).subquery()
     
     query = db.query(subq)

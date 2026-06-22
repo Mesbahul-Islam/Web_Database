@@ -25,4 +25,10 @@ settings = Settings()
 SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = settings.ALGORITHM
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
-DATABASE_URL = settings.DATABASE_URL if settings.DATABASE_URL else f"sqlite:///{_PROJECT_ROOT / 'sqlite-backup' / 'puutarhakanta2005.sqlite'}"
+
+# SQLAlchemy 1.4+ requires postgresql://, but some providers (like Vercel) use postgres://
+raw_db_url = settings.DATABASE_URL
+if raw_db_url and raw_db_url.startswith("postgres://"):
+    raw_db_url = raw_db_url.replace("postgres://", "postgresql://", 1)
+
+DATABASE_URL = raw_db_url if raw_db_url else f"sqlite:///{_PROJECT_ROOT / 'sqlite-backup' / 'puutarhakanta2005.sqlite'}"

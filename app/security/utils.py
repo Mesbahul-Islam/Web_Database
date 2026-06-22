@@ -20,7 +20,7 @@ def get_user(db: Session, username: str) -> User | None:
 async def get_current_user(
     token: Annotated[str, Depends(oauth2_scheme)],
     db: Annotated[Session, Depends(get_db)],
-):
+) -> User:
     credentials_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
     detail="Could not validate credentials",
@@ -53,7 +53,7 @@ def verify_password(plain_password, hashed_password):
 def get_password_hash(password):
     return password_hash.hash(password)
 
-def authenticate_user(db: Session, username: str, password: str):
+def authenticate_user(db: Session, username: str, password: str) -> User | bool:
     user = get_user(db, username)
     if not user:
         verify_password(password, DUMMY_HASH)
