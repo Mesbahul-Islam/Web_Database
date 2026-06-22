@@ -61,14 +61,32 @@ def upgrade() -> None:
             })
             
     if updates:
-        # Use bulk update to avoid 31k network roundtrips
-        update_stmt = (
-            toimenpide.update()
-            .where(toimenpide.c.toimenpide_nro == sa.bindparam("b_toimenpide_nro"))
-            .values(created_at=sa.bindparam("b_created_at"), updated_at=sa.bindparam("b_updated_at"))
-        )
-        # Execute all updates in a single executemany call
-        bind.execute(update_stmt, updates)
+        if bind.dialect.name == 'postgresql':
+            # PostgreSQL fast raw bulk update (bypasses psycopg2 executemany unrolling)
+            values_parts = []
+            for u in updates:
+                values_parts.append(f"({u['b_toimenpide_nro']}, '{u['b_created_at']}', '{u['b_updated_at']}')")
+            
+            batch_size = 5000
+            for i in range(0, len(values_parts), batch_size):
+                batch = values_parts[i:i+batch_size]
+                values_str = ", ".join(batch)
+                sql = f"""
+                UPDATE toimenpide AS t
+                SET created_at = CAST(v.created_at AS TIMESTAMP),
+                    updated_at = CAST(v.updated_at AS TIMESTAMP)
+                FROM (VALUES {values_str}) AS v(toimenpide_nro, created_at, updated_at)
+                WHERE t.toimenpide_nro = v.toimenpide_nro;
+                """
+                bind.execute(sa.text(sql))
+        else:
+            # Fallback for SQLite (which is local and fast enough with executemany)
+            update_stmt = (
+                toimenpide.update()
+                .where(toimenpide.c.toimenpide_nro == sa.bindparam("b_toimenpide_nro"))
+                .values(created_at=sa.bindparam("b_created_at"), updated_at=sa.bindparam("b_updated_at"))
+            )
+            bind.execute(update_stmt, updates)
 
 
 def downgrade() -> None:
