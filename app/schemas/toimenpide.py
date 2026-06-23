@@ -8,6 +8,7 @@ class ToimenpideBase(BaseModel):
     toimenpide: Optional[str] = None
     hankintaID: Optional[int] = None
     uus_pvm: Optional[str] = None
+    deleted_at: Optional[datetime] = None
 
 class ToimenpideCreate(ToimenpideBase):
     toimenpide_nro: Optional[int] = None

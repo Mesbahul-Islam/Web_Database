@@ -153,6 +153,9 @@ api_router.include_router(viite_router, prefix="/viite", tags=["Viite"])  # viit
 from app.api.endpoints.ymparistoindikaattoriluonne import router as ymparistoindikaattoriluonne_router  # ymparistoindikaattoriluonne: environmental indicator trait
 api_router.include_router(ymparistoindikaattoriluonne_router, prefix="/ymparistoindikaattoriluonne", tags=["Ymparistoindikaattoriluonne"])  # ymparistoindikaattoriluonne: environmental indicator trait
 
+from app.api.endpoints.raportit import router as raportit_router
+api_router.include_router(raportit_router, prefix="/raportit", tags=["Raportit"])
+
 
 ### Auth ###
 

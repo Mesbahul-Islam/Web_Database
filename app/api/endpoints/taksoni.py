@@ -151,8 +151,8 @@ def read_hankintatiedot_yhteenveto(
             "tieteellinen_nimi": item.tieteellinen_nimi,
             "suku": item.suku,
             "laji": item.laji,
-            "hankintanumerot": item.hankintanumerot,
-            "hankinnat_lkm": item.hankinnat_lkm,
+            "hankintanumerot": item.hankintanumerot if item.hankintanumerot is not None else "",
+            "hankinnat_lkm": item.hankinnat_lkm if item.hankinnat_lkm is not None else 0,
             "searchId": str(item.taksonin_nro)
         })
 

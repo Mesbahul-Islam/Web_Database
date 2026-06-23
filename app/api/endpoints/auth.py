@@ -34,12 +34,12 @@ async def login_for_access_token(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-@router.get("/users/me", response_model=UserSchema)
+@router.get("/users/me", response_model=UserSchema, response_model_exclude={"password"})
 async def read_users_me(current_user: Annotated[User, Depends(get_current_user)]):
     return current_user
 
 
-@router.post("/users", response_model=UserSchema, status_code=201)
+@router.post("/users", response_model=UserSchema, status_code=201, response_model_exclude={"password"})
 async def create_user(
     payload: UserCreate,
     current_user: Annotated[User, Depends(get_current_user)],
@@ -66,7 +66,7 @@ async def create_user(
     db.refresh(user)
     return user
 
-@router.get("/users", response_model=List[UserSchema])
+@router.get("/users", response_model=List[UserSchema], response_model_exclude={"password"})
 async def list_users(
     current_user: Annotated[User, Depends(get_current_user)],
     db: Session = Depends(get_db),
