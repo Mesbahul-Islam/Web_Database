@@ -5,7 +5,7 @@ from typing import Annotated, List
 from app.core.oauth_client import oauth2_scheme
 from app.database import get_db
 from app.models.user import User, RoleEnum
-from app.schemas.user import User as UserSchema, UserCreate
+from app.schemas.user import User as UserSchema, UserCreate, UserUpdate
 from app.security.utils import get_current_user, get_user, authenticate_user, get_password_hash
 from app.security.token import create_access_token
 from datetime import timedelta
@@ -38,6 +38,23 @@ async def login_for_access_token(
 async def read_users_me(current_user: Annotated[User, Depends(get_current_user)]):
     return current_user
 
+@router.put("/users/me", response_model=UserSchema, response_model_exclude={"password"})
+async def update_users_me(
+    payload: UserUpdate,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Session = Depends(get_db),
+):
+    if payload.username and payload.username != current_user.username:
+        if get_user(db, payload.username):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username already exists")
+        current_user.username = payload.username
+        
+    if payload.password:
+        current_user.password = get_password_hash(payload.password)
+        
+    db.commit()
+    db.refresh(current_user)
+    return current_user
 
 @router.post("/users", response_model=UserSchema, status_code=201, response_model_exclude={"password"})
 async def create_user(
@@ -74,3 +91,23 @@ async def list_users(
     if current_user.role_name != RoleEnum.ADMIN:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin privileges required")
     return db.query(User).all()
+
+@router.delete("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(
+    user_id: int,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Session = Depends(get_db),
+):
+    if current_user.role_name != RoleEnum.ADMIN:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin privileges required")
+    
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        
+    if user.id == current_user.id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot delete your own account")
+        
+    db.delete(user)
+    db.commit()
+    return None

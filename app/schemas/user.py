@@ -15,3 +15,6 @@ class User(UserBase):
     updated_at: Optional[datetime] = None
     model_config = ConfigDict(from_attributes=True)
 
+class UserUpdate(BaseModel):
+    username: Optional[str] = None
+    password: Optional[str] = None

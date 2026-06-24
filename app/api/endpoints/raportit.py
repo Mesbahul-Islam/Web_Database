@@ -368,7 +368,7 @@ from app.models.viite import Viite
 
 @router.get("/lahettaja_viite")
 def generate_lahettaja_viite_raportti(
-    list_type: str = Query("sender", regex="^(sender|reference)$"),
+    list_type: str = Query("sender", pattern="^(sender|reference)$"),
     extensiveData: bool = False,
     db: Session = Depends(get_db)
 ):
