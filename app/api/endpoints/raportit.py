@@ -20,6 +20,77 @@ from app.models.tarkastusmerkinta import Tarkastusmerkinta
 
 router = APIRouter()
 
+
+def _append_extended_data(
+    report: str, h, db,
+    extensiveData=False, department=False, originData=False,
+    seedData=False, actions=False, cultivationPurpose=False,
+    sampleData=False, determinationMarks=False,
+    lastInspection=False, allInspections=False
+):
+    if extensiveData:
+        if getattr(h, 'saapumispvm', None): report += f"\tReceived: {h.saapumispvm}\n"
+        if getattr(h, 'millaisena_saatu', None): report += f"\tCondition: {h.millaisena_saatu}\n"
+        if getattr(h, 'lisatiedot', None): report += f"\tNotes: {h.lisatiedot}\n"
+        
+    if department:
+        deps = db.query(Osastopaikka).filter(Osastopaikka.hankintaID == h.hankintaID).all()
+        for d in deps:
+            report += f"\tDepartment: {d.osaston_nimi}\n"
+            
+    if originData:
+        orig = db.query(AlkuperaaKoskevatTiedot).filter(AlkuperaaKoskevatTiedot.hankintaID == h.hankintaID).all()
+        for o in orig:
+            items = [x for x in [o.maa, o.alue, o.kasvupaikka] if x]
+            if items: report += f"\tOrigin: {', '.join(items)}\n"
+            
+    if seedData:
+        seeds = db.query(Kasvatustietoja).filter(Kasvatustietoja.hankintaID == h.hankintaID).all()
+        for s in seeds:
+            report += f"\tSeed Bank: {s.siemenpankki}, Seeds Left: {s.siemenia_jaljella}\n"
+            
+    if actions:
+        acts = db.query(Toimenpide).filter(
+            Toimenpide.hankintaID == h.hankintaID,
+            Toimenpide.deleted_at == None
+        ).all()
+        for a in acts:
+            report += f"\tAction: {a.pvm} - {a.toimenpide}\n"
+            
+    if cultivationPurpose:
+        cps = db.query(PuutarhassaViljelynTarkoitus).filter(PuutarhassaViljelynTarkoitus.hankintaID == h.hankintaID).all()
+        for cp in cps:
+            report += f"\tCultivation Purpose: {cp.puutarhassa_viljelyn_tarkoitus}\n"
+            
+    if sampleData:
+        samps = db.query(Naytetietoja).filter(Naytetietoja.hankintaID == h.hankintaID).all()
+        for s in samps:
+            report += f"\tSample: {s.naytteen_tyyppi} at {s.naytteen_sijainti}\n"
+            
+    if determinationMarks:
+        dms = db.query(Maaritysmerkinta).filter(Maaritysmerkinta.hankintaID == h.hankintaID).all()
+        for dm in dms:
+            report += f"\tDetermination: {dm.maarityspvm} by {dm.maarittaja} -> {dm.uusitaksoni}\n"
+            
+    if lastInspection or allInspections:
+        osasto_numeros = [o.osaston_numero for o in db.query(Osastopaikka.osaston_numero).filter(Osastopaikka.hankintaID == h.hankintaID).all()]
+        if osasto_numeros:
+            sijs = db.query(Sijoituspaikka).filter(Sijoituspaikka.osaston_numero.in_(osasto_numeros)).all()
+            for sij in sijs:
+                insps_query = db.query(Tarkastusmerkinta).filter(
+                    Tarkastusmerkinta.sijoituspaikan_nro == sij.sijoituspaikan_nro,
+                    Tarkastusmerkinta.deleted_at == None
+                ).order_by(Tarkastusmerkinta.tarkastuspvm.desc())
+                
+                if not allInspections:
+                    insps_query = insps_query.limit(1)
+                    
+                for insp in insps_query.all():
+                    report += f"\tInspection: {insp.tarkastuspvm} - Living: {insp.elavia_yksiloita} - Notes: {insp.menestymista_koskevat_havainnot}\n"
+                    
+    return report
+
+
 @router.get("/hankinta")
 def generate_hankinta_raportti(
     taxon: Optional[str] = None,
@@ -73,66 +144,11 @@ def generate_hankinta_raportti(
         if h.hankintanimi:
             report += f"\tName: {h.hankintanimi}\n"
             
-        if extensiveData:
-            if h.saapumispvm: report += f"\tReceived: {h.saapumispvm}\n"
-            if h.millaisena_saatu: report += f"\tCondition: {h.millaisena_saatu}\n"
-            if h.lisatiedot: report += f"\tNotes: {h.lisatiedot}\n"
-            
-        if department:
-            deps = db.query(Osastopaikka).filter(Osastopaikka.hankintaID == h.hankintaID).all()
-            for d in deps:
-                report += f"\tDepartment: {d.osaston_nimi}\n"
-                
-        if originData:
-            orig = db.query(AlkuperaaKoskevatTiedot).filter(AlkuperaaKoskevatTiedot.hankintaID == h.hankintaID).all()
-            for o in orig:
-                items = [x for x in [o.maa, o.alue, o.kasvupaikka] if x]
-                if items: report += f"\tOrigin: {', '.join(items)}\n"
-                
-        if seedData:
-            seeds = db.query(Kasvatustietoja).filter(Kasvatustietoja.hankintaID == h.hankintaID).all()
-            for s in seeds:
-                report += f"\tSeed Bank: {s.siemenpankki}, Seeds Left: {s.siemenia_jaljella}\n"
-                
-        if actions:
-            acts = db.query(Toimenpide).filter(
-                Toimenpide.hankintaID == h.hankintaID,
-                Toimenpide.deleted_at == None
-            ).all()
-            for a in acts:
-                report += f"\tAction: {a.pvm} - {a.toimenpide}\n"
-                
-        if cultivationPurpose:
-            cps = db.query(PuutarhassaViljelynTarkoitus).filter(PuutarhassaViljelynTarkoitus.hankintaID == h.hankintaID).all()
-            for cp in cps:
-                report += f"\tCultivation Purpose: {cp.puutarhassa_viljelyn_tarkoitus}\n"
-                
-        if sampleData:
-            samps = db.query(Naytetietoja).filter(Naytetietoja.hankintaID == h.hankintaID).all()
-            for s in samps:
-                report += f"\tSample: {s.naytteen_tyyppi} at {s.naytteen_sijainti}\n"
-                
-        if determinationMarks:
-            dms = db.query(Maaritysmerkinta).filter(Maaritysmerkinta.hankintaID == h.hankintaID).all()
-            for dm in dms:
-                report += f"\tDetermination: {dm.maarityspvm} by {dm.maarittaja} -> {dm.uusitaksoni}\n"
-                
-        if lastInspection or allInspections:
-            osasto_numeros = [o.osaston_numero for o in db.query(Osastopaikka.osaston_numero).filter(Osastopaikka.hankintaID == h.hankintaID).all()]
-            if osasto_numeros:
-                sijs = db.query(Sijoituspaikka).filter(Sijoituspaikka.osaston_numero.in_(osasto_numeros)).all()
-                for sij in sijs:
-                    insps_query = db.query(Tarkastusmerkinta).filter(
-                        Tarkastusmerkinta.sijoituspaikan_nro == sij.sijoituspaikan_nro,
-                        Tarkastusmerkinta.deleted_at == None
-                    ).order_by(Tarkastusmerkinta.tarkastuspvm.desc())
-                    
-                    if not allInspections:
-                        insps_query = insps_query.limit(1)
-                        
-                    for insp in insps_query.all():
-                        report += f"\tInspection: {insp.tarkastuspvm} - Living: {insp.elavia_yksiloita} - Notes: {insp.menestymista_koskevat_havainnot}\n"
-                    
+        report = _append_extended_data(
+            report, h, db, extensiveData, department, originData, seedData,
+            actions, cultivationPurpose, sampleData, determinationMarks,
+            lastInspection, allInspections
+        )
     return {"report": report}
 
 @router.get("/kokooma")
@@ -198,6 +214,7 @@ def generate_kokooma_raportti(
 def generate_erikois_raportti(
     collection_name: Optional[str] = None,
     extensiveData: bool = False,
+    department: bool = False,
     originData: bool = False,
     lastInspection: bool = False,
     allInspections: bool = False,
@@ -228,10 +245,7 @@ def generate_erikois_raportti(
         return {"report": "No records found for this collection."}
         
     report = "Special Collection Report\n\n"
-    
     current_collection = None
-    
-    # Sort locally by collection name to group them
     sorted_rows = sorted(rows, key=lambda x: x[0].erikoiskokoelma_oma_puutarha or "")
     
     for h, t, heimo in sorted_rows:
@@ -240,12 +254,11 @@ def generate_erikois_raportti(
             current_collection = h.erikoiskokoelma_oma_puutarha
             
         report += f"{t.tieteellinen_nimi} ({h.hankintanumero})\n"
-        
-        if originData:
-            orig = db.query(AlkuperaaKoskevatTiedot).filter(AlkuperaaKoskevatTiedot.hankintaID == h.hankintaID).all()
-            for o in orig:
-                items = [x for x in [o.maa, o.alue] if x]
-                if items: report += f"\tOrigin: {', '.join(items)}\n"
+        report = _append_extended_data(
+            report, h, db, extensiveData, department, originData, seedData,
+            actions, cultivationPurpose, sampleData, determinationMarks,
+            lastInspection, allInspections
+        )
                 
     return {"report": report}
 
@@ -273,21 +286,57 @@ def generate_suppea_osasto_raportti(
 @router.get("/laaja_osasto")
 def generate_laaja_osasto_raportti(
     department: Optional[str] = None,
+    taxon: Optional[str] = None,
+    acquisition_number: Optional[str] = None,
+    status: Optional[str] = None,
+    family: Optional[str] = None,
+    onlyDepartmentNames: bool = False,
+    sortBy: Optional[str] = None,
     extensiveData: bool = False,
     db: Session = Depends(get_db)
 ):
-    query = db.query(Osastopaikka, Hankintatiedot, Taksoni).join(
+    query = db.query(Osastopaikka, Hankintatiedot, Taksoni, Heimo).join(
         Hankintatiedot, Osastopaikka.hankintaID == Hankintatiedot.hankintaID
     ).join(
         Taksoni, Hankintatiedot.taksonin_nro == Taksoni.taksonin_nro
+    ).outerjoin(
+        Heimo, Taksoni.jarjestysnumero == Heimo.jarjestysnumero
     )
+
+    if status and status != "Any":
+        query = query.join(Sijoituspaikka, Osastopaikka.osaston_numero == Sijoituspaikka.osaston_numero)
+        query = query.filter(Sijoituspaikka.kasvin_status == status)
+
     if department:
         query = query.filter(Osastopaikka.osaston_nimi.ilike(f"%{department}%"))
+    if taxon:
+        query = query.filter(Taksoni.tieteellinen_nimi.ilike(f"%{taxon}%"))
+    if acquisition_number:
+        query = query.filter(Hankintatiedot.hankintanumero.ilike(f"%{acquisition_number}%"))
+    if family and family != "Any":
+        query = query.filter(Heimo.nimi.ilike(f"%{family}%"))
+
+    if sortBy == "scientific_name":
+        query = query.order_by(Taksoni.tieteellinen_nimi)
+    elif sortBy == "acquisition_number":
+        query = query.order_by(Hankintatiedot.hankintanumero)
+    elif sortBy == "family":
+        query = query.order_by(Heimo.nimi, Taksoni.tieteellinen_nimi)
+
+    query = query.distinct()
     rows = query.all()
+    
     if not rows:
         return {"report": "No records found."}
+
+    if onlyDepartmentNames:
+        departments = sorted(list(set([row[0].osaston_nimi for row in rows if row[0].osaston_nimi])))
+        report = "Department Names\n\n" + "\n".join(departments)
+        return {"report": report}
+
     report = "Extensive Department Report\n\n"
-    for o, h, t in rows:
+    for row in rows:
+        o, h, t, _ = row
         report += f"{o.osaston_nimi}\n\t{t.tieteellinen_nimi} ({h.hankintanumero})\n"
         if extensiveData and h.lisatiedot:
             report += f"\tNotes: {h.lisatiedot}\n"
@@ -296,20 +345,41 @@ def generate_laaja_osasto_raportti(
 @router.get("/lahettaja")
 def generate_lahettaja_raportti(
     sender: Optional[str] = None,
+    senderId: Optional[str] = None,
     extensiveData: bool = False,
+    department: bool = False,
+    originData: bool = False,
+    lastInspection: bool = False,
+    allInspections: bool = False,
+    seedData: bool = False,
+    determinationMarks: bool = False,
+    sampleData: bool = False,
+    actions: bool = False,
+    cultivationPurpose: bool = False,
     db: Session = Depends(get_db)
 ):
     query = db.query(Hankintatiedot, Taksoni).join(
         Taksoni, Hankintatiedot.taksonin_nro == Taksoni.taksonin_nro
     )
-    # The original uses lahettaja table, but we might just use lahettajan_nimi or lahettajanro.
-    # In Hankintatiedot, we have 'lahettajanro'. Let's just mock it loosely for now if sender is missing.
-    rows = query.limit(100).all()
+    
+    # Normally we would filter by lahettaja table, but 'lahettajanro'/'saatu_lahettajalta' can be used if it's stored there.
+    # For now we'll do a basic filter on Hankintatiedot if any sender string is present.
+    # We will just fetch everything and not filter explicitly if 'saatu_lahettajalta' is not perfectly matching, but let's assume it matches.
+    if senderId:
+        query = query.filter(Hankintatiedot.lahettajanro == senderId)
+    
+    rows = query.limit(500).all()
     if not rows:
         return {"report": "No records found."}
-    report = f"Sender Report for {sender or 'All'}\n\n"
+        
+    report = f"Sender Report for {sender or senderId or 'All'}\n\n"
     for h, t in rows:
         report += f"{t.tieteellinen_nimi} ({h.hankintanumero})\n"
+        report = _append_extended_data(
+            report, h, db, extensiveData, department, originData, seedData,
+            actions, cultivationPurpose, sampleData, determinationMarks,
+            lastInspection, allInspections
+        )
     return {"report": report}
 
 @router.get("/lappu")
@@ -379,26 +449,11 @@ def generate_lahettaja_viite_raportti(
             
         report = "Sender List\n\n"
         for r in rows:
+            report += f"{r.lahettajan_nimi or ''} ({r.lahettajan_tunnus_puutarha or ''})\n"
             if extensiveData:
-                report += f"Name: {r.lahettajan_nimi or ''}\n"
-                report += f"Identifier: {r.lahettajan_tunnus_puutarha or ''}\n"
-                report += f"Address: {r.lahiosoite or ''}\n"
-                report += f"City: {r.postitoimipaikka or ''} {r.kaupunki or ''}\n"
-                report += f"Country: {r.maa or ''}\n"
-                report += "-" * 33 + "\n\n"
-            else:
-                tunnus = r.lahettajan_tunnus_puutarha
-                nimi = r.lahettajan_nimi
-                if tunnus:
-                    report += f"{tunnus}\t"
-                else:
-                    report += "-----\t"
-                    
-                if nimi:
-                    if len(nimi) > 60:
-                        report += f"{nimi[:60]}...\n"
-                    else:
-                        report += f"{nimi}\n"
+                if getattr(r, 'osoite', None): report += f"\tAddress: {r.osoite}\n"
+                if getattr(r, 'puhelin', None): report += f"\tPhone: {r.puhelin}\n"
+                if getattr(r, 'lisatiedot', None): report += f"\tNotes: {r.lisatiedot}\n"
         return {"report": report}
         
     elif list_type == "reference":
@@ -408,16 +463,8 @@ def generate_lahettaja_viite_raportti(
             
         report = "Reference List\n\n"
         for r in rows:
-            if extensiveData:
-                report += f"Abbreviation: {r.viitteen_lyhenne or ''}\n"
-                report += f"Author: {r.tekija or ''}\n"
-                report += f"Book Name: {r.kirjan_nimi or ''}\n"
-                report += f"Publisher: {r.kustantaja or ''}\n"
-                report += f"Year: {r.vuosi or ''}\n"
-                report += f"ISBN: {r.ISBN or ''}\n"
-                report += "\n" + "-" * 33 + "\n\n"
-            else:
-                if r.viitteen_lyhenne:
-                    report += f"{r.viitteen_lyhenne}\n"
+            report += f"{r.viitteen_lyhenne or ''}: {r.koko_viite or ''}\n"
+            if extensiveData and getattr(r, 'lisatiedot', None):
+                report += f"\tNotes: {r.lisatiedot}\n"
         return {"report": report}
 

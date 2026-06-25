@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query, Request
 from math import ceil
 from sqlalchemy.orm import Session
-from sqlalchemy import or_, and_
+from sqlalchemy import or_, and_, func
 from typing import List, Optional
 from pydantic import BaseModel
 
@@ -18,6 +18,7 @@ class OsastollaItem(BaseModel):
     hankintaID: Optional[int]
     hankintanumero: Optional[str]
     tieteellinen_nimi: Optional[str]
+    auktori: Optional[str]
     sijoituspaikan_nimi: Optional[str]
     osaston_nimi: Optional[str]
 
@@ -45,6 +46,15 @@ def get_osastolla(
         HankintatiedotModel.hankintaID,
         HankintatiedotModel.hankintanumero,
         TaksoniModel.tieteellinen_nimi,
+        func.coalesce(
+            func.nullif(TaksoniModel.alatason_5_auktori, ''),
+            func.nullif(TaksoniModel.alatason_4_auktori, ''),
+            func.nullif(TaksoniModel.alatason_3_auktori, ''),
+            func.nullif(TaksoniModel.alatason_2_auktori, ''),
+            func.nullif(TaksoniModel.alatason_1_auktori, ''),
+            func.nullif(TaksoniModel.lajin_auktori, ''),
+            func.nullif(TaksoniModel.suvun_auktori, '')
+        ).label('auktori'),
         SijoituspaikkaModel.sijoituspaikan_nimi,
         OsastopaikkaModel.osaston_nimi
     ).join(
@@ -59,12 +69,22 @@ def get_osastolla(
 
     if search:
         search_term = f"%{search}%"
+        author_coalesce = func.coalesce(
+            func.nullif(TaksoniModel.alatason_5_auktori, ''),
+            func.nullif(TaksoniModel.alatason_4_auktori, ''),
+            func.nullif(TaksoniModel.alatason_3_auktori, ''),
+            func.nullif(TaksoniModel.alatason_2_auktori, ''),
+            func.nullif(TaksoniModel.alatason_1_auktori, ''),
+            func.nullif(TaksoniModel.lajin_auktori, ''),
+            func.nullif(TaksoniModel.suvun_auktori, '')
+        )
         query = query.filter(
             or_(
                 HankintatiedotModel.hankintanumero.ilike(search_term),
                 SijoituspaikkaModel.sijoituspaikan_nimi.ilike(search_term),
                 OsastopaikkaModel.osaston_nimi.ilike(search_term),
-                TaksoniModel.tieteellinen_nimi.ilike(search_term)
+                TaksoniModel.tieteellinen_nimi.ilike(search_term),
+                author_coalesce.ilike(search_term)
             )
         )
 
@@ -76,6 +96,14 @@ def get_osastolla(
         query = query.order_by(HankintatiedotModel.hankintanumero.asc())
     elif sort_by == "-hankintanumero":
         query = query.order_by(HankintatiedotModel.hankintanumero.desc())
+    elif sort_by == "osaston_nimi":
+        query = query.order_by(OsastopaikkaModel.osaston_nimi.asc())
+    elif sort_by == "-osaston_nimi":
+        query = query.order_by(OsastopaikkaModel.osaston_nimi.desc())
+    elif sort_by == "tieteellinen_nimi":
+        query = query.order_by(TaksoniModel.tieteellinen_nimi.asc())
+    elif sort_by == "-tieteellinen_nimi":
+        query = query.order_by(TaksoniModel.tieteellinen_nimi.desc())
     else:
         query = query.order_by(SijoituspaikkaModel.sijoituspaikan_nro.desc())
 
@@ -90,6 +118,7 @@ def get_osastolla(
             hankintaID=row.hankintaID,
             hankintanumero=row.hankintanumero,
             tieteellinen_nimi=row.tieteellinen_nimi,
+            auktori=row.auktori,
             sijoituspaikan_nimi=row.sijoituspaikan_nimi,
             osaston_nimi=row.osaston_nimi
         )
