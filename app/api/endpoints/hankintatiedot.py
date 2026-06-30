@@ -14,6 +14,7 @@ from app.schemas.hankintatiedot import (
     Hankintatiedot as Schema,
     HankintatiedotCreate as SchemaCreate,
     HankintatiedotPage as SchemaPage,
+    HankintatiedotTags,
 )  # hankintatiedot: acquisition_data
 
 from app.models.alkuperaa_koskevat_tiedot import AlkuperaaKoskevatTiedot as AlkuperaaKoskevatTiedotModel
@@ -75,6 +76,19 @@ async def update_one(hankintaID: int, payload: SchemaCreate, current_user: Annot
 async def delete_one(hankintaID: int, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):
     invalidate_endpoint_cache("hankintatiedot")
     await delete_item(db, Model, "hankintaID", hankintaID)
+
+@router.get("/{hankintaID}/tags", response_model=HankintatiedotTags)
+def read_tags(hankintaID: int, db: Session = Depends(get_db)):
+    item = db.query(Model).filter(Model.hankintaID == hankintaID).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Not found")
+    return item
+
+@router.put("/{hankintaID}/tags", response_model=HankintatiedotTags)
+async def update_tags(hankintaID: int, payload: HankintatiedotTags, current_user: Annotated[User, Depends(get_current_user)], db: Session = Depends(get_db)):
+    invalidate_endpoint_cache("hankintatiedot")
+    return await update_item(payload, db, Model, "hankintaID", hankintaID)
+
 @router.get("/{hankintaID}/alkuperaa_koskevat_tiedot", response_model=AlkuperaaKoskevatTiedotPage)
 def read_alkuperaa_koskevat_tiedot_by_hankintaID(hankintaID: int, request: Request, page: int = Query(1, ge=1), page_size: int = Query(200, ge=1), db: Session = Depends(get_db)):
     query = apply_filters(db.query(AlkuperaaKoskevatTiedotModel).filter(AlkuperaaKoskevatTiedotModel.hankintaID == hankintaID), AlkuperaaKoskevatTiedotModel, request.query_params)

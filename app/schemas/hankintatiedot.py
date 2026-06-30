@@ -45,3 +45,12 @@ class HankintatiedotPage(BaseModel):
     page: int
     page_size: int
     pages: int
+
+class HankintatiedotTags(BaseModel):
+    hankintaID: Optional[int] = None
+    tag_en: Optional[str] = None
+    tag_fi: Optional[str] = None
+    why_en: Optional[str] = None
+    why_fi: Optional[str] = None
+    time_definition_en: Optional[str] = None
+    time_definition_fi: Optional[str] = None
