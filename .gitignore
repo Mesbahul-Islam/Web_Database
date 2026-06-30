@@ -9,3 +9,4 @@ docs/
 docker
 sqlite-backup
 db-backups
+.agents
