@@ -54,6 +54,18 @@ class Hankintatiedot(Base, TimestampMixin):
     vuosiluku: Mapped[Optional[int]] = mapped_column(Integer)
     # Taxonomic family
     heimo: Mapped[Optional[str]] = mapped_column(String(255))
+    # Tag (EN)
+    tag_en: Mapped[Optional[str]] = mapped_column(String(255))
+    # Tag (FI)
+    tag_fi: Mapped[Optional[str]] = mapped_column(String(255))
+    # Why (EN)
+    why_en: Mapped[Optional[str]] = mapped_column(Text)
+    # Miksi (FI)
+    why_fi: Mapped[Optional[str]] = mapped_column(Text)
+    # Time definition (EN)
+    time_definition_en: Mapped[Optional[str]] = mapped_column(Text)
+    # Aikamääre (FI)
+    time_definition_fi: Mapped[Optional[str]] = mapped_column(Text)
     # Sender or source
     lahettaja: Mapped['Lahettaja'] = relationship('Lahettaja', back_populates='hankintatiedot')
     # Taxon
