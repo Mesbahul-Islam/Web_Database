@@ -24,6 +24,12 @@ class HankintatiedotBase(BaseModel):
     numero: Optional[int] = None
     vuosiluku: Optional[int] = None
     heimo: Optional[str] = None
+    tag_en: Optional[str] = None
+    tag_fi: Optional[str] = None
+    why_en: Optional[str] = None
+    why_fi: Optional[str] = None
+    time_definition_en: Optional[str] = None
+    time_definition_fi: Optional[str] = None
 
 class HankintatiedotCreate(HankintatiedotBase):
     hankintaID: Optional[int] = None
